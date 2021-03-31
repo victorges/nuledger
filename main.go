@@ -5,12 +5,13 @@ import (
 
 	"nuledger/iop"
 	"nuledger/model"
+	"nuledger/model/violation"
 )
 
 type dummyHandler struct{}
 
 func (d dummyHandler) Handle(op model.OperationInput) (model.StateOutput, error) {
-	return model.StateOutput{Account: op.Account}, nil
+	return model.StateOutput{Account: op.Account, Violations: []violation.Code{}}, nil
 }
 
 func main() {

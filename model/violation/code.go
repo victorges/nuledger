@@ -1,0 +1,14 @@
+package violation
+
+// Code represents a violation code to be included in the output messages
+// respective to specific errors processing requested operations.
+type Code string
+
+const (
+	AccountNotInitialized      Code = "account-not-initialized"
+	AccountAlreadyInitialized       = "account-already-initialized"
+	InsufficientLimit               = "insufficient-limit"
+	CardNotActive                   = "card-not-active"
+	HighFrequencySmallInterval      = "high-frequency-small-interval"
+	DoubleTransaction               = "double-transaction"
+)
