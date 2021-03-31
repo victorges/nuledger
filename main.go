@@ -7,7 +7,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/victorges/nudger/model"
+	"nuledger/model"
 )
 
 func main() {
