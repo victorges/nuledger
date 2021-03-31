@@ -56,9 +56,6 @@ func writeState(out *bufio.Writer, state model.StateOutput) error {
 	if err := encoder.Encode(state); err != nil {
 		return fmt.Errorf("Error writing state JSON to output: %w", err)
 	}
-	if _, err := fmt.Fprintln(out); err != nil {
-		return fmt.Errorf("Error adding line break to output: %w", err)
-	}
 	if err := out.Flush(); err != nil {
 		return fmt.Errorf("Error flusing output buffer: %w", err)
 	}
