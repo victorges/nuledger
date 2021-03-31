@@ -6,17 +6,9 @@ import (
 	"fmt"
 	"io"
 	"os"
+
+	"github.com/victorges/nudger/model"
 )
-
-type OperationInput struct {
-	Account     json.RawMessage `json:"account"`
-	Transaction json.RawMessage `json:"transaction"`
-}
-
-type StateOutput struct {
-	Account    json.RawMessage `json:"account"`
-	Violations json.RawMessage `json:"violations"`
-}
 
 func main() {
 	var (
@@ -24,10 +16,10 @@ func main() {
 		out = bufio.NewWriter(os.Stdout)
 	)
 
-	var op OperationInput
+	var op model.OperationInput
 	for readOperation(in, &op) {
 		// TODO: Call actual ledger to return state
-		state := StateOutput{Account: op.Account}
+		state := model.StateOutput{Account: op.Account}
 
 		if err := writeState(out, state); err != nil {
 			panic(err)
@@ -35,8 +27,8 @@ func main() {
 	}
 }
 
-func readOperation(in *json.Decoder, op *OperationInput) bool {
-	*op = OperationInput{}
+func readOperation(in *json.Decoder, op *model.OperationInput) bool {
+	*op = model.OperationInput{}
 	if err := in.Decode(op); err == io.EOF {
 		return false
 	} else if err != nil {
@@ -45,7 +37,7 @@ func readOperation(in *json.Decoder, op *OperationInput) bool {
 	return true
 }
 
-func writeState(out *bufio.Writer, state StateOutput) error {
+func writeState(out *bufio.Writer, state model.StateOutput) error {
 	encoder := json.NewEncoder(out)
 	if err := encoder.Encode(state); err != nil {
 		return fmt.Errorf("Error writing state JSON to output: %w", err)
