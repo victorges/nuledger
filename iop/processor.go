@@ -7,6 +7,8 @@ import (
 	"nuledger/model"
 )
 
+// DataHandler provides a Handle function for processing the input read by the
+// input processor and returning the output that should be written.
 type DataHandler interface {
 	Handle(model.OperationInput) (model.StateOutput, error)
 }
