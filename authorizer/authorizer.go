@@ -17,6 +17,13 @@ type Authorizer struct {
 	doubleTxLimiters map[doubleTransactionKey]*RateLimiter
 }
 
+func NewAuthorizer() *Authorizer {
+	return &Authorizer{
+		globalLimiter:    NewRateLimiter(3, 2*time.Minute),
+		doubleTxLimiters: map[doubleTransactionKey]*RateLimiter{},
+	}
+}
+
 func (a *Authorizer) CreateAccount(account *model.Account) (model.Account, error) {
 	if a.accountState != nil {
 		err := violation.NewError(violation.AccountAlreadyInitialized, "Account has already been initialized")
@@ -36,25 +43,25 @@ func (a *Authorizer) PerformTransaction(transaction *model.Transaction) (model.A
 	}
 	if !account.ActiveCard {
 		err := violation.NewError(violation.CardNotActive, "Account card is not active")
-		return model.Account{}, err
+		return *account, err
 	}
 	if account.AvailableLimit < transaction.Amount {
 		err := violation.NewError(violation.InsufficientLimit, "Transaction amount is higher than available limit")
-		return model.Account{}, err
+		return *account, err
 	}
 	if ok, err := a.globalLimiter.Take(transaction.Time); err != nil {
-		return model.Account{}, err
+		return *account, err
 	} else if !ok {
 		err := violation.NewError(violation.HighFrequencySmallInterval, "Too many transactions in a small interval")
-		return model.Account{}, err
+		return *account, err
 	}
 	// TODO: We need to "untake" the global tx above in case the double transaction validation fails.
 	doubleTxLimiter := a.getDoubleTransactionLimiter(transaction)
 	if ok, err := doubleTxLimiter.Take(transaction.Time); err != nil {
-		return model.Account{}, err
+		return *account, err
 	} else if !ok {
 		err := violation.NewError(violation.DoubleTransaction, "Duplicate transaction of same amount and merchant")
-		return model.Account{}, err
+		return *account, err
 	}
 	account.AvailableLimit -= transaction.Amount
 	return *account, nil

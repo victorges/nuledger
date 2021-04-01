@@ -9,11 +9,11 @@ import (
 )
 
 type Handler struct {
-	Authorizer
+	*Authorizer
 }
 
 func NewHandler() iop.DataHandler {
-	return &Handler{Authorizer{}}
+	return &Handler{NewAuthorizer()}
 }
 
 type operationType int

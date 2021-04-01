@@ -17,8 +17,8 @@ func NewRateLimiter(maxEvents int, interval time.Duration) *RateLimiter {
 }
 
 func (l *RateLimiter) Take(event time.Time) (bool, error) {
-	last := l.pastEvents.Back().Value.(time.Time)
-	if !event.After(last) {
+	last := l.pastEvents.Back()
+	if last != nil && !event.After(last.Value.(time.Time)) {
 		return false, fmt.Errorf("Events must be sent in chronological order: Received %v after %v", event, last)
 	}
 
@@ -31,7 +31,7 @@ func (l *RateLimiter) Take(event time.Time) (bool, error) {
 }
 
 func (l *RateLimiter) popEventsBefore(threshold time.Time) {
-	for {
+	for l.pastEvents.Len() > 0 {
 		firstElm := l.pastEvents.Front()
 		first := firstElm.Value.(time.Time)
 		if !first.Before(threshold) {
