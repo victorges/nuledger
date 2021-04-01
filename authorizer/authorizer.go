@@ -7,6 +7,12 @@ import (
 	"time"
 )
 
+type CommitFunc func()
+
+type Rule interface {
+	Validate(transaction *model.Transaction) (CommitFunc, error)
+}
+
 type doubleTransactionKey struct {
 	Merchant string
 	Amount   int
