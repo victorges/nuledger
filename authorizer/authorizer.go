@@ -39,6 +39,7 @@ func (a *Authorizer) PerformTransaction(transaction *model.Transaction) (model.A
 	account := a.accountState
 	if account == nil {
 		err := violation.NewError(violation.AccountNotInitialized, "Account hasn't been initialized")
+		// TODO: Change return to a pointer to have a null output instead of default object
 		return model.Account{}, err
 	}
 	if !account.ActiveCard {
