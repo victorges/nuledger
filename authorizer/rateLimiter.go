@@ -24,13 +24,29 @@ func (l *RateLimiter) Take(event time.Time) bool {
 	return true
 }
 
+func (l *RateLimiter) Allow(event time.Time) bool {
+	return l.countEventsNotBefore(event.Add(-l.interval)) < l.maxEvents
+}
+
 func (l *RateLimiter) popEventsBefore(threshold time.Time) {
 	for l.pastEvents.Len() > 0 {
-		firstElm := l.pastEvents.Front()
-		first := firstElm.Value.(time.Time)
-		if !first.Before(threshold) {
+		elm := l.pastEvents.Front()
+		value := elm.Value.(time.Time)
+		if !value.Before(threshold) {
 			break
 		}
-		l.pastEvents.Remove(firstElm)
+		l.pastEvents.Remove(elm)
 	}
+}
+
+func (l *RateLimiter) countEventsNotBefore(threshold time.Time) int {
+	count := 0
+	for elm := l.pastEvents.Back(); elm != nil; elm = elm.Prev() {
+		value := elm.Value.(time.Time)
+		if value.Before(threshold) {
+			break
+		}
+		count++
+	}
+	return count
 }

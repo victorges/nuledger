@@ -58,16 +58,17 @@ func (a *Authorizer) PerformTransaction(transaction *model.Transaction) (model.A
 		err := violation.NewError(violation.InsufficientLimit, "Transaction amount is higher than available limit")
 		return *account, err
 	}
-	if !a.globalLimiter.Take(transaction.Time) {
+	if !a.globalLimiter.Allow(transaction.Time) {
 		err := violation.NewError(violation.HighFrequencySmallInterval, "Too many transactions in a small interval")
 		return *account, err
 	}
-	// TODO: We need to "untake" the global tx above in case the double transaction validation fails.
 	doubleTxLimiter := a.getDoubleTransactionLimiter(transaction)
-	if !doubleTxLimiter.Take(transaction.Time) {
+	if !doubleTxLimiter.Allow(transaction.Time) {
 		err := violation.NewError(violation.DoubleTransaction, "Duplicate transaction of same amount and merchant")
 		return *account, err
 	}
+	a.globalLimiter.Take(transaction.Time)
+	doubleTxLimiter.Take(transaction.Time)
 	account.AvailableLimit -= transaction.Amount
 	return *account, nil
 }
