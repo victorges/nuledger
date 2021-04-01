@@ -48,6 +48,7 @@ func (a *Authorizer) PerformTransaction(transaction *model.Transaction) (model.A
 		err := violation.NewError(violation.HighFrequencySmallInterval, "Too many transactions in a small interval")
 		return model.Account{}, err
 	}
+	// TODO: We need to "untake" the global tx above in case the double transaction validation fails.
 	doubleTxLimiter := a.getDoubleTransactionLimiter(transaction)
 	if ok, err := doubleTxLimiter.Take(transaction.Time); err != nil {
 		return model.Account{}, err
