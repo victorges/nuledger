@@ -6,8 +6,8 @@ import (
 
 // OperationInput is a JSON received as an input for an operation to be run.
 type OperationInput struct {
-	Account     Account     `json:"account"`
-	Transaction Transaction `json:"transaction"`
+	Account     *Account     `json:"account"`
+	Transaction *Transaction `json:"transaction"`
 }
 
 // StateOutput represents a JSON to be written in the output as the result of
