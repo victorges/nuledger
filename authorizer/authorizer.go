@@ -21,5 +21,19 @@ func (a *Authorizer) CreateAccount(account *model.Account) (model.Account, error
 }
 
 func (a *Authorizer) PerformTransaction(transaction *model.Transaction) (model.Account, error) {
-	return model.Account{}, nil
+	account := a.accountState
+	if account == nil {
+		err := violation.NewError(violation.AccountNotInitialized, "Account hasn't been initialized")
+		return model.Account{}, err
+	}
+	if !account.ActiveCard {
+		err := violation.NewError(violation.CardNotActive, "Account card is not active")
+		return model.Account{}, err
+	}
+	if account.AvailableLimit < transaction.Amount {
+		err := violation.NewError(violation.InsufficientLimit, "Transaction amount is higher than available limit")
+		return model.Account{}, err
+	}
+	account.AvailableLimit -= transaction.Amount
+	return *account, nil
 }
