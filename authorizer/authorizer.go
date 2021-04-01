@@ -1,6 +1,7 @@
 package authorizer
 
 import (
+	"fmt"
 	"nuledger/model"
 	"nuledger/model/violation"
 	"time"
@@ -15,6 +16,7 @@ type Authorizer struct {
 	accountState     *model.Account
 	globalLimiter    *RateLimiter
 	doubleTxLimiters map[doubleTransactionKey]*RateLimiter
+	lastTxTime       time.Time
 }
 
 func NewAuthorizer() *Authorizer {
@@ -36,6 +38,12 @@ func (a *Authorizer) CreateAccount(account *model.Account) (model.Account, error
 }
 
 func (a *Authorizer) PerformTransaction(transaction *model.Transaction) (model.Account, error) {
+	if transaction.Time.Before(a.lastTxTime) {
+		return model.Account{}, fmt.Errorf("Transactions must be sent in chronological order. Received %v after %v", transaction.Time, a.lastTxTime)
+	}
+	a.lastTxTime = transaction.Time
+
+	// TODO: Create some kind of authorization rule interface to abstract each of these validations.
 	account := a.accountState
 	if account == nil {
 		err := violation.NewError(violation.AccountNotInitialized, "Account hasn't been initialized")
@@ -50,17 +58,13 @@ func (a *Authorizer) PerformTransaction(transaction *model.Transaction) (model.A
 		err := violation.NewError(violation.InsufficientLimit, "Transaction amount is higher than available limit")
 		return *account, err
 	}
-	if ok, err := a.globalLimiter.Take(transaction.Time); err != nil {
-		return *account, err
-	} else if !ok {
+	if !a.globalLimiter.Take(transaction.Time) {
 		err := violation.NewError(violation.HighFrequencySmallInterval, "Too many transactions in a small interval")
 		return *account, err
 	}
 	// TODO: We need to "untake" the global tx above in case the double transaction validation fails.
 	doubleTxLimiter := a.getDoubleTransactionLimiter(transaction)
-	if ok, err := doubleTxLimiter.Take(transaction.Time); err != nil {
-		return *account, err
-	} else if !ok {
+	if !doubleTxLimiter.Take(transaction.Time) {
 		err := violation.NewError(violation.DoubleTransaction, "Duplicate transaction of same amount and merchant")
 		return *account, err
 	}
