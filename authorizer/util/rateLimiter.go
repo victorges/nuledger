@@ -1,4 +1,4 @@
-package rules
+package util
 
 import (
 	"container/list"

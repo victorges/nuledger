@@ -1,17 +1,18 @@
 package rules
 
 import (
+	"nuledger/authorizer/util"
 	"nuledger/model"
 	"nuledger/model/violation"
 	"time"
 )
 
 type LimitedFrequency struct {
-	limiter *RateLimiter
+	limiter *util.RateLimiter
 }
 
 func NewLimitedFrequency(maxTransactions int, interval time.Duration) Rule {
-	return &LimitedFrequency{NewRateLimiter(maxTransactions, interval)}
+	return &LimitedFrequency{util.NewRateLimiter(maxTransactions, interval)}
 }
 
 func (f *LimitedFrequency) Authorize(_ model.Account, transaction *model.Transaction) (CommitFunc, error) {

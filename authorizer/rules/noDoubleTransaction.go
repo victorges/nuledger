@@ -1,6 +1,7 @@
 package rules
 
 import (
+	"nuledger/authorizer/util"
 	"nuledger/model"
 	"nuledger/model/violation"
 	"time"
@@ -8,11 +9,11 @@ import (
 
 type NoDoubleTransaction struct {
 	doubleTxInterval time.Duration
-	limiters         map[doubleTransactionKey]*RateLimiter
+	limiters         map[doubleTransactionKey]*util.RateLimiter
 }
 
 func NewNoDoubleTransaction(interval time.Duration) Rule {
-	return &NoDoubleTransaction{interval, map[doubleTransactionKey]*RateLimiter{}}
+	return &NoDoubleTransaction{interval, map[doubleTransactionKey]*util.RateLimiter{}}
 }
 
 func (d *NoDoubleTransaction) Authorize(_ model.Account, transaction *model.Transaction) (CommitFunc, error) {
@@ -29,11 +30,11 @@ type doubleTransactionKey struct {
 	Amount   int64
 }
 
-func (d *NoDoubleTransaction) getLimiter(transaction *model.Transaction) *RateLimiter {
+func (d *NoDoubleTransaction) getLimiter(transaction *model.Transaction) *util.RateLimiter {
 	key := doubleTransactionKey{transaction.Merchant, transaction.Amount}
 	limiter := d.limiters[key]
 	if limiter == nil {
-		limiter = NewRateLimiter(1, d.doubleTxInterval)
+		limiter = util.NewRateLimiter(1, d.doubleTxInterval)
 		d.limiters[key] = limiter
 	}
 	return limiter
