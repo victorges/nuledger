@@ -16,8 +16,7 @@ func NewLimitedFrequency(maxTransactions int, interval time.Duration) Rule {
 
 func (f *LimitedFrequency) Authorize(_ model.Account, transaction *model.Transaction) (CommitFunc, error) {
 	if !f.limiter.Allows(transaction.Time) {
-		err := violation.NewError(violation.HighFrequencySmallInterval, "Too many transactions in a small interval")
-		return nil, err
+		return nil, violation.ErrorHighFrequencySmallInterval
 	}
 	commit := func() { f.limiter.Take(transaction.Time) }
 	return commit, nil

@@ -19,8 +19,7 @@ func NewAuthorizer() *Authorizer {
 
 func (a *Authorizer) CreateAccount(account *model.Account) (*model.Account, error) {
 	if a.accountState != nil {
-		err := violation.NewError(violation.AccountAlreadyInitialized, "Account has already been initialized")
-		return a.accountState.Copy(), err
+		return a.accountState.Copy(), violation.ErrorAccountAlreadyInitialized
 	}
 
 	a.accountState = account.Copy()
@@ -29,8 +28,7 @@ func (a *Authorizer) CreateAccount(account *model.Account) (*model.Account, erro
 
 func (a *Authorizer) PerformTransaction(transaction *model.Transaction) (*model.Account, error) {
 	if a.accountState == nil {
-		err := violation.NewError(violation.AccountNotInitialized, "Account hasn't been initialized")
-		return nil, err
+		return nil, violation.ErrorAccountNotInitialized
 	}
 
 	commitFuncs, err := authorize(*a.accountState, a.rules, transaction)
