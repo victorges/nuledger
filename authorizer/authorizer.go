@@ -8,10 +8,10 @@ import (
 
 type Authorizer struct {
 	accountState *model.Account
-	rules        rule.RuleList
+	rules        rule.List
 }
 
-func NewAuthorizer(rules rule.RuleList) *Authorizer {
+func NewAuthorizer(rules rule.List) *Authorizer {
 	return &Authorizer{rules: rules}
 }
 

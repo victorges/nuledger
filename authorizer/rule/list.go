@@ -2,12 +2,12 @@ package rule
 
 import "nuledger/model"
 
-type RuleList []Rule
+type List []Rule
 
-// Ensure implementation of Rule interface
-var _ Rule = RuleList(nil)
+// Ensure List implements of Rule interface
+var _ Rule = List(nil)
 
-func (l RuleList) Authorize(account model.Account, transaction *model.Transaction) (CommitFunc, error) {
+func (l List) Authorize(account model.Account, transaction *model.Transaction) (CommitFunc, error) {
 	var (
 		commitFuncs = make([]CommitFunc, 0, 2)
 		errs        []error

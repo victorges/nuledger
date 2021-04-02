@@ -10,11 +10,11 @@ const (
 	maxIntervalTransactions   = 3
 )
 
-func Default() rule.RuleList {
-	return rule.RuleList{
+func Default() rule.List {
+	return rule.List{
 		&ChronologicalOrder{},
-		rule.RuleFunc(AccountCardActive),
-		rule.RuleFunc(SufficientLimit),
+		rule.Func(AccountCardActive),
+		rule.Func(SufficientLimit),
 		NewLimitedFrequency(maxIntervalTransactions, frequencyAnalysisInterval),
 		NewNoDoubleTransaction(frequencyAnalysisInterval),
 	}
