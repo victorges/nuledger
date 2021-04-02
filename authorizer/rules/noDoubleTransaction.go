@@ -6,11 +6,6 @@ import (
 	"time"
 )
 
-type doubleTransactionKey struct {
-	Merchant string
-	Amount   int64
-}
-
 type NoDoubleTransaction struct {
 	doubleTxInterval time.Duration
 	limiters         map[doubleTransactionKey]*RateLimiter
@@ -27,6 +22,11 @@ func (d *NoDoubleTransaction) Authorize(_ model.Account, transaction *model.Tran
 	}
 	commit := func() { limiter.Take(transaction.Time) }
 	return commit, nil
+}
+
+type doubleTransactionKey struct {
+	Merchant string
+	Amount   int64
 }
 
 func (d *NoDoubleTransaction) getLimiter(transaction *model.Transaction) *RateLimiter {
