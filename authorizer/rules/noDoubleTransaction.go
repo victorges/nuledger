@@ -1,6 +1,7 @@
 package rules
 
 import (
+	"nuledger/authorizer/rule"
 	"nuledger/authorizer/util"
 	"nuledger/model"
 	"nuledger/model/violation"
@@ -12,11 +13,11 @@ type NoDoubleTransaction struct {
 	limiters         map[doubleTransactionKey]*util.RateLimiter
 }
 
-func NewNoDoubleTransaction(interval time.Duration) Rule {
+func NewNoDoubleTransaction(interval time.Duration) rule.Rule {
 	return &NoDoubleTransaction{interval, map[doubleTransactionKey]*util.RateLimiter{}}
 }
 
-func (d *NoDoubleTransaction) Authorize(_ model.Account, transaction *model.Transaction) (CommitFunc, error) {
+func (d *NoDoubleTransaction) Authorize(_ model.Account, transaction *model.Transaction) (rule.CommitFunc, error) {
 	limiter := d.getLimiter(transaction)
 	if !limiter.Allows(transaction.Time) {
 		return nil, violation.ErrorDoubleTransaction

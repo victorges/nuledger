@@ -1,17 +1,20 @@
 package rules
 
-import "time"
+import (
+	"nuledger/authorizer/rule"
+	"time"
+)
 
 const (
 	frequencyAnalysisInterval = 2 * time.Minute
 	maxIntervalTransactions   = 3
 )
 
-func Default() RuleList {
-	return RuleList{
+func Default() rule.RuleList {
+	return rule.RuleList{
 		&ChronologicalOrder{},
-		RuleFunc(AccountCardActive),
-		RuleFunc(SufficientLimit),
+		rule.RuleFunc(AccountCardActive),
+		rule.RuleFunc(SufficientLimit),
 		NewLimitedFrequency(maxIntervalTransactions, frequencyAnalysisInterval),
 		NewNoDoubleTransaction(frequencyAnalysisInterval),
 	}

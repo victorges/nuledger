@@ -1,17 +1,17 @@
 package authorizer
 
 import (
-	"nuledger/authorizer/rules"
+	"nuledger/authorizer/rule"
 	"nuledger/model"
 	"nuledger/model/violation"
 )
 
 type Authorizer struct {
 	accountState *model.Account
-	rules        rules.RuleList
+	rules        rule.RuleList
 }
 
-func NewAuthorizer(rules rules.RuleList) *Authorizer {
+func NewAuthorizer(rules rule.RuleList) *Authorizer {
 	return &Authorizer{rules: rules}
 }
 
