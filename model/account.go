@@ -7,3 +7,7 @@ type Account struct {
 	ActiveCard     bool `json:"active-card"`
 	AvailableLimit int  `json:"available-limit"`
 }
+
+func (a Account) Copy() *Account {
+	return &a
+}

@@ -13,6 +13,6 @@ type OperationInput struct {
 // StateOutput represents a JSON to be written in the output as the result of
 // performing an operation.
 type StateOutput struct {
-	Account    Account          `json:"account"`
+	Account    *Account         `json:"account"`
 	Violations []violation.Code `json:"violations"`
 }

@@ -30,7 +30,7 @@ func (h *Handler) Handle(op model.OperationInput) (model.StateOutput, error) {
 		return model.StateOutput{}, fmt.Errorf("Bad operation object: %w", err)
 	}
 
-	var account model.Account
+	var account *model.Account
 	switch opType {
 	case operationTypeCreateAccount:
 		account, err = h.CreateAccount(op.Account)

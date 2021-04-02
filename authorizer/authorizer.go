@@ -17,32 +17,30 @@ func NewAuthorizer() *Authorizer {
 	}
 }
 
-func (a *Authorizer) CreateAccount(account *model.Account) (model.Account, error) {
+func (a *Authorizer) CreateAccount(account *model.Account) (*model.Account, error) {
 	if a.accountState != nil {
 		err := violation.NewError(violation.AccountAlreadyInitialized, "Account has already been initialized")
-		return *a.accountState, err
+		return a.accountState.Copy(), err
 	}
 
-	a.accountState = &model.Account{}
-	*a.accountState = *account
-	return *a.accountState, nil
+	a.accountState = account.Copy()
+	return account, nil
 }
 
-func (a *Authorizer) PerformTransaction(transaction *model.Transaction) (model.Account, error) {
+func (a *Authorizer) PerformTransaction(transaction *model.Transaction) (*model.Account, error) {
 	if a.accountState == nil {
 		err := violation.NewError(violation.AccountNotInitialized, "Account hasn't been initialized")
-		// TODO: Change return to a pointer to have a null output instead of default object
-		return model.Account{}, err
+		return nil, err
 	}
 
 	commitFuncs, err := authorize(*a.accountState, a.rules, transaction)
 	if err != nil {
-		return *a.accountState, err
+		return a.accountState.Copy(), err
 	}
 
 	a.accountState.AvailableLimit -= transaction.Amount
 	invokeAll(commitFuncs)
-	return *a.accountState, nil
+	return a.accountState.Copy(), nil
 }
 
 func authorize(account model.Account, authRules []rules.Rule, transaction *model.Transaction) ([]rules.CommitFunc, error) {
