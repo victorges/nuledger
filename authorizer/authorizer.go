@@ -30,15 +30,16 @@ func (a *Authorizer) PerformTransaction(transaction *model.Transaction) (*model.
 	if a.accountState == nil {
 		return nil, violation.ErrorAccountNotInitialized
 	}
+	account := a.accountState
 
-	commitFuncs, err := authorize(*a.accountState, a.rules, transaction)
+	commitFuncs, err := authorize(*account, a.rules, transaction)
 	if err != nil {
-		return a.accountState.Copy(), err
+		return account.Copy(), err
 	}
 
-	a.accountState.AvailableLimit -= transaction.Amount
+	account.AvailableLimit -= transaction.Amount
 	invokeAll(commitFuncs)
-	return a.accountState.Copy(), nil
+	return account.Copy(), nil
 }
 
 func authorize(account model.Account, authRules []rules.Rule, transaction *model.Transaction) ([]rules.CommitFunc, error) {
