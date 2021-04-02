@@ -4,26 +4,16 @@ import (
 	"nuledger/authorizer/rules"
 	"nuledger/model"
 	"nuledger/model/violation"
-	"time"
 )
 
-type doubleTransactionKey struct {
-	Merchant string
-	Amount   int
-}
-
 type Authorizer struct {
-	accountState     *model.Account
-	globalLimiter    *RateLimiter
-	doubleTxLimiters map[doubleTransactionKey]*RateLimiter
-	rules            []rules.Rule
+	accountState *model.Account
+	rules        []rules.Rule
 }
 
 func NewAuthorizer() *Authorizer {
 	return &Authorizer{
-		globalLimiter:    NewRateLimiter(3, 2*time.Minute),
-		doubleTxLimiters: map[doubleTransactionKey]*RateLimiter{},
-		rules:            rules.Default(),
+		rules: rules.Default(),
 	}
 }
 
@@ -63,31 +53,9 @@ func (a *Authorizer) PerformTransaction(transaction *model.Transaction) (model.A
 		return *a.accountState, errs[0]
 	}
 
-	account := a.accountState
-	if !a.globalLimiter.Allow(transaction.Time) {
-		err := violation.NewError(violation.HighFrequencySmallInterval, "Too many transactions in a small interval")
-		return *account, err
-	}
-	doubleTxLimiter := a.getDoubleTransactionLimiter(transaction)
-	if !doubleTxLimiter.Allow(transaction.Time) {
-		err := violation.NewError(violation.DoubleTransaction, "Duplicate transaction of same amount and merchant")
-		return *account, err
-	}
-	a.globalLimiter.Take(transaction.Time)
-	doubleTxLimiter.Take(transaction.Time)
-	account.AvailableLimit -= transaction.Amount
+	a.accountState.AvailableLimit -= transaction.Amount
 	for _, commit := range commitFuncs {
 		commit()
 	}
-	return *account, nil
-}
-
-func (a *Authorizer) getDoubleTransactionLimiter(transaction *model.Transaction) *RateLimiter {
-	key := doubleTransactionKey{transaction.Merchant, transaction.Amount}
-	doubleTxLimiter := a.doubleTxLimiters[key]
-	if doubleTxLimiter == nil {
-		doubleTxLimiter = NewRateLimiter(1, 2*time.Minute)
-		a.doubleTxLimiters[key] = doubleTxLimiter
-	}
-	return doubleTxLimiter
+	return *a.accountState, nil
 }
