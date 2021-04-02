@@ -7,7 +7,7 @@ import (
 
 type AccountCardActive struct{}
 
-func (AccountCardActive) Validate(account model.Account, transaction *model.Transaction) (CommitFunc, error) {
+func (AccountCardActive) Authorize(account model.Account, transaction *model.Transaction) (CommitFunc, error) {
 	if !account.ActiveCard {
 		err := violation.NewError(violation.CardNotActive, "Account card is not active")
 		return nil, err
@@ -17,7 +17,7 @@ func (AccountCardActive) Validate(account model.Account, transaction *model.Tran
 
 type SufficientLimit struct{}
 
-func (SufficientLimit) Validate(account model.Account, transaction *model.Transaction) (CommitFunc, error) {
+func (SufficientLimit) Authorize(account model.Account, transaction *model.Transaction) (CommitFunc, error) {
 	if account.AvailableLimit < transaction.Amount {
 		err := violation.NewError(violation.InsufficientLimit, "Transaction amount is higher than available limit")
 		return nil, err

@@ -20,7 +20,7 @@ func NewNoDoubleTransaction(interval time.Duration) Rule {
 	return &NoDoubleTransaction{interval, map[doubleTransactionKey]*RateLimiter{}}
 }
 
-func (d *NoDoubleTransaction) Validate(_ model.Account, transaction *model.Transaction) (CommitFunc, error) {
+func (d *NoDoubleTransaction) Authorize(_ model.Account, transaction *model.Transaction) (CommitFunc, error) {
 	limiter := d.getLimiter(transaction)
 	if !limiter.Allow(transaction.Time) {
 		err := violation.NewError(violation.DoubleTransaction, "Duplicate transaction of same amount and merchant")

@@ -7,5 +7,5 @@ import (
 type CommitFunc func()
 
 type Rule interface {
-	Validate(account model.Account, transaction *model.Transaction) (CommitFunc, error)
+	Authorize(account model.Account, transaction *model.Transaction) (CommitFunc, error)
 }

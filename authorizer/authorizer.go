@@ -53,7 +53,7 @@ func authorize(account model.Account, authRules []rules.Rule, transaction *model
 		errs        []error
 	)
 	for _, rule := range authRules {
-		commit, err := rule.Validate(account, transaction)
+		commit, err := rule.Authorize(account, transaction)
 		if commit != nil {
 			commitFuncs = append(commitFuncs, commit)
 		}
