@@ -24,7 +24,7 @@ func (l *RateLimiter) Take(event time.Time) bool {
 	return true
 }
 
-func (l *RateLimiter) Allow(event time.Time) bool {
+func (l *RateLimiter) Allows(event time.Time) bool {
 	return l.countEventsNotBefore(event.Add(-l.interval)) < l.maxEvents
 }
 

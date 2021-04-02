@@ -22,7 +22,7 @@ func NewNoDoubleTransaction(interval time.Duration) Rule {
 
 func (d *NoDoubleTransaction) Authorize(_ model.Account, transaction *model.Transaction) (CommitFunc, error) {
 	limiter := d.getLimiter(transaction)
-	if !limiter.Allow(transaction.Time) {
+	if !limiter.Allows(transaction.Time) {
 		err := violation.NewError(violation.DoubleTransaction, "Duplicate transaction of same amount and merchant")
 		return nil, err
 	}
