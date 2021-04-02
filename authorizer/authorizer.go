@@ -59,11 +59,7 @@ func authorize(account model.Account, authRules []rules.Rule, transaction *model
 			errs = append(errs, err)
 		}
 	}
-	if len(errs) > 0 {
-		// TODO: Aggregate errors
-		return commitFuncs, errs[0]
-	}
-	return commitFuncs, nil
+	return commitFuncs, model.AggregateErrors(errs)
 }
 
 func invokeAll(funcs []rules.CommitFunc) {
