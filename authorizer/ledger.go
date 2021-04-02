@@ -8,11 +8,11 @@ import (
 
 type Ledger struct {
 	accountState *model.Account
-	rules        rule.List
+	authzer      rule.Authorizer
 }
 
-func NewLedger(rules rule.List) *Ledger {
-	return &Ledger{rules: rules}
+func NewLedger(authzer rule.Authorizer) *Ledger {
+	return &Ledger{authzer: authzer}
 }
 
 func (l *Ledger) CreateAccount(account model.Account) (*model.Account, error) {
@@ -30,7 +30,7 @@ func (l *Ledger) PerformTransaction(transaction model.Transaction) (*model.Accou
 	}
 	account := l.accountState
 
-	commitFunc, err := l.rules.Authorize(*account, transaction)
+	commitFunc, err := l.authzer.Authorize(*account, transaction)
 	if err != nil {
 		return account.Copy(), err
 	}

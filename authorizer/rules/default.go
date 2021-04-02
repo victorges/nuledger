@@ -10,7 +10,7 @@ const (
 	maxIntervalTransactions   = 3
 )
 
-func Default() rule.List {
+func Default() rule.Authorizer {
 	return rule.List{
 		&ChronologicalOrder{},
 		rule.AuthorizerFunc(AccountCardActive),
