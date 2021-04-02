@@ -24,10 +24,10 @@ const (
 	operationTypePerformTransaction
 )
 
-func (h *Handler) Handle(op model.OperationInput) (model.StateOutput, error) {
+func (h *Handler) Handle(op iop.OperationInput) (iop.StateOutput, error) {
 	opType, err := getOperationType(op)
 	if err != nil {
-		return model.StateOutput{}, fmt.Errorf("Bad operation object: %w", err)
+		return iop.StateOutput{}, fmt.Errorf("Bad operation object: %w", err)
 	}
 
 	var account *model.Account
@@ -37,17 +37,17 @@ func (h *Handler) Handle(op model.OperationInput) (model.StateOutput, error) {
 	case operationTypePerformTransaction:
 		account, err = h.PerformTransaction(op.Transaction)
 	default:
-		return model.StateOutput{}, errors.New("Internal error: Unknown operation type")
+		return iop.StateOutput{}, errors.New("Internal error: Unknown operation type")
 	}
 
 	violations, err := extractViolations(err)
 	if err != nil {
-		return model.StateOutput{}, err
+		return iop.StateOutput{}, err
 	}
-	return model.StateOutput{account, violations}, nil
+	return iop.StateOutput{account, violations}, nil
 }
 
-func getOperationType(op model.OperationInput) (operationType, error) {
+func getOperationType(op iop.OperationInput) (operationType, error) {
 	hasAccount := op.Account != nil
 	hasTransaction := op.Transaction != nil
 	if hasAccount == hasTransaction {

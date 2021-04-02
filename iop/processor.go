@@ -4,13 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"nuledger/model"
 )
 
 // DataHandler provides a Handle function for processing the input read by the
 // input processor and returning the output that should be written.
 type DataHandler interface {
-	Handle(model.OperationInput) (model.StateOutput, error)
+	Handle(OperationInput) (StateOutput, error)
 }
 
 // IOProcessor is the Input/Output Processor (or iop, hence the package name) of
@@ -33,7 +32,7 @@ func NewProcessor(in io.Reader, out io.Writer, handler DataHandler) *IOProcessor
 
 func (p *IOProcessor) Process() error {
 	for {
-		var op model.OperationInput
+		var op OperationInput
 		if err := p.in.Decode(&op); err == io.EOF {
 			break
 		} else if err != nil {
