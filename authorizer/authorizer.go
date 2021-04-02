@@ -39,12 +39,18 @@ func (a *Authorizer) CreateAccount(account *model.Account) (model.Account, error
 }
 
 func (a *Authorizer) PerformTransaction(transaction *model.Transaction) (model.Account, error) {
+	if a.accountState == nil {
+		err := violation.NewError(violation.AccountNotInitialized, "Account hasn't been initialized")
+		// TODO: Change return to a pointer to have a null output instead of default object
+		return model.Account{}, err
+	}
+
 	var (
 		commitFuncs = make([]rules.CommitFunc, 0, 2)
 		errs        []error
 	)
 	for _, rule := range a.rules {
-		commit, err := rule.Validate(transaction)
+		commit, err := rule.Validate(*a.accountState, transaction)
 		if commit != nil {
 			commitFuncs = append(commitFuncs, commit)
 		}
@@ -54,23 +60,10 @@ func (a *Authorizer) PerformTransaction(transaction *model.Transaction) (model.A
 	}
 	if len(errs) > 0 {
 		// TODO: Aggregate errors
-		return model.Account{}, errs[0]
+		return *a.accountState, errs[0]
 	}
 
 	account := a.accountState
-	if account == nil {
-		err := violation.NewError(violation.AccountNotInitialized, "Account hasn't been initialized")
-		// TODO: Change return to a pointer to have a null output instead of default object
-		return model.Account{}, err
-	}
-	if !account.ActiveCard {
-		err := violation.NewError(violation.CardNotActive, "Account card is not active")
-		return *account, err
-	}
-	if account.AvailableLimit < transaction.Amount {
-		err := violation.NewError(violation.InsufficientLimit, "Transaction amount is higher than available limit")
-		return *account, err
-	}
 	if !a.globalLimiter.Allow(transaction.Time) {
 		err := violation.NewError(violation.HighFrequencySmallInterval, "Too many transactions in a small interval")
 		return *account, err
