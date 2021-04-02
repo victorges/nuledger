@@ -7,8 +7,8 @@ const (
 	maxIntervalTransactions   = 3
 )
 
-func Default() []Rule {
-	return []Rule{
+func Default() RuleList {
+	return RuleList{
 		&ChronologicalOrder{},
 		RuleFunc(AccountCardActive),
 		RuleFunc(SufficientLimit),

@@ -3,6 +3,7 @@ package authorizer
 import (
 	"errors"
 	"fmt"
+	"nuledger/authorizer/rules"
 	"nuledger/iop"
 	"nuledger/model"
 	"nuledger/model/violation"
@@ -13,7 +14,7 @@ type Handler struct {
 }
 
 func NewHandler() iop.DataHandler {
-	return &Handler{NewAuthorizer()}
+	return &Handler{NewAuthorizer(rules.Default())}
 }
 
 type operationType int

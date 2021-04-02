@@ -8,13 +8,11 @@ import (
 
 type Authorizer struct {
 	accountState *model.Account
-	rules        []rules.Rule
+	rules        rules.RuleList
 }
 
-func NewAuthorizer() *Authorizer {
-	return &Authorizer{
-		rules: rules.Default(),
-	}
+func NewAuthorizer(rules rules.RuleList) *Authorizer {
+	return &Authorizer{rules: rules}
 }
 
 func (a *Authorizer) CreateAccount(account *model.Account) (*model.Account, error) {
@@ -32,35 +30,12 @@ func (a *Authorizer) PerformTransaction(transaction *model.Transaction) (*model.
 	}
 	account := a.accountState
 
-	commitFuncs, err := authorize(*account, a.rules, transaction)
+	commitFunc, err := a.rules.Authorize(*account, transaction)
 	if err != nil {
 		return account.Copy(), err
 	}
 
 	account.AvailableLimit -= transaction.Amount
-	invokeAll(commitFuncs)
+	commitFunc()
 	return account.Copy(), nil
-}
-
-func authorize(account model.Account, authRules []rules.Rule, transaction *model.Transaction) ([]rules.CommitFunc, error) {
-	var (
-		commitFuncs = make([]rules.CommitFunc, 0, 2)
-		errs        []error
-	)
-	for _, rule := range authRules {
-		commit, err := rule.Authorize(account, transaction)
-		if commit != nil {
-			commitFuncs = append(commitFuncs, commit)
-		}
-		if err != nil {
-			errs = append(errs, err)
-		}
-	}
-	return commitFuncs, model.AggregateErrors(errs)
-}
-
-func invokeAll(funcs []rules.CommitFunc) {
-	for _, f := range funcs {
-		f()
-	}
 }
