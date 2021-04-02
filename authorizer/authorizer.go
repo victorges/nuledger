@@ -41,9 +41,7 @@ func (a *Authorizer) PerformTransaction(transaction *model.Transaction) (model.A
 	}
 
 	a.accountState.AvailableLimit -= transaction.Amount
-	for _, commit := range commitFuncs {
-		commit()
-	}
+	invokeAll(commitFuncs)
 	return *a.accountState, nil
 }
 
@@ -66,4 +64,10 @@ func authorize(account model.Account, authRules []rules.Rule, transaction *model
 		return commitFuncs, errs[0]
 	}
 	return commitFuncs, nil
+}
+
+func invokeAll(funcs []rules.CommitFunc) {
+	for _, f := range funcs {
+		f()
+	}
 }
