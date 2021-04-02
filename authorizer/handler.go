@@ -40,11 +40,11 @@ func (h *Handler) Handle(op model.OperationInput) (model.StateOutput, error) {
 		return model.StateOutput{}, errors.New("Internal error: Unknown operation type")
 	}
 
-	var verr *violation.Error
-	if err != nil && !errors.As(err, &verr) {
+	violations, err := extractViolations(err)
+	if err != nil {
 		return model.StateOutput{}, err
 	}
-	return newStateOutput(account, verr), nil
+	return model.StateOutput{account, violations}, nil
 }
 
 func getOperationType(op model.OperationInput) (operationType, error) {
@@ -59,13 +59,26 @@ func getOperationType(op model.OperationInput) (operationType, error) {
 	return operationTypePerformTransaction, nil
 }
 
-func newStateOutput(account model.Account, err *violation.Error) model.StateOutput {
-	out := model.StateOutput{
-		Account:    account,
-		Violations: []violation.Code{},
+func extractViolations(err error) ([]violation.Code, error) {
+	var verr *violation.Error
+	if errors.As(err, &verr) {
+		return []violation.Code{verr.Code}, nil
 	}
-	if err != nil {
-		out.Violations = append(out.Violations, err.Code)
+	var aggErr model.AggregateError
+	if !errors.As(err, &aggErr) {
+		return []violation.Code{}, err
 	}
-	return out
+
+	var (
+		violations = make([]violation.Code, 0, len(aggErr.Errors))
+		fatalErrs  []error
+	)
+	for _, innerErr := range aggErr.Errors {
+		if errors.As(innerErr, &verr) {
+			violations = append(violations, verr.Code)
+		} else {
+			fatalErrs = append(fatalErrs, innerErr)
+		}
+	}
+	return violations, model.AggregateErrors(fatalErrs)
 }

@@ -10,8 +10,10 @@ type AggregateError struct {
 }
 
 func AggregateErrors(errs []error) error {
-	if len(errs) == 0 {
+	if count := len(errs); count == 0 {
 		return nil
+	} else if count == 1 {
+		return errs[0]
 	}
 	return AggregateError{errs}
 }
