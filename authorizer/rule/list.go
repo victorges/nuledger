@@ -2,10 +2,10 @@ package rule
 
 import "nuledger/model"
 
-type List []Rule
+type List []Authorizer
 
 // Ensure List implements of Rule interface
-var _ Rule = List(nil)
+var _ Authorizer = List(nil)
 
 func (l List) Authorize(account model.Account, transaction *model.Transaction) (CommitFunc, error) {
 	var (

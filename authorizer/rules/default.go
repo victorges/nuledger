@@ -13,8 +13,8 @@ const (
 func Default() rule.List {
 	return rule.List{
 		&ChronologicalOrder{},
-		rule.Func(AccountCardActive),
-		rule.Func(SufficientLimit),
+		rule.AuthFunc(AccountCardActive),
+		rule.AuthFunc(SufficientLimit),
 		NewLimitedFrequency(maxIntervalTransactions, frequencyAnalysisInterval),
 		NewNoDoubleTransaction(frequencyAnalysisInterval),
 	}

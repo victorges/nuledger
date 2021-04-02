@@ -12,7 +12,7 @@ type LimitedFrequency struct {
 	limiter *util.RateLimiter
 }
 
-func NewLimitedFrequency(maxTransactions int, interval time.Duration) rule.Rule {
+func NewLimitedFrequency(maxTransactions int, interval time.Duration) rule.Authorizer {
 	return &LimitedFrequency{util.NewRateLimiter(maxTransactions, interval)}
 }
 

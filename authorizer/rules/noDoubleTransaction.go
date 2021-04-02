@@ -13,7 +13,7 @@ type NoDoubleTransaction struct {
 	limiters         map[doubleTransactionKey]*util.RateLimiter
 }
 
-func NewNoDoubleTransaction(interval time.Duration) rule.Rule {
+func NewNoDoubleTransaction(interval time.Duration) rule.Authorizer {
 	return &NoDoubleTransaction{interval, map[doubleTransactionKey]*util.RateLimiter{}}
 }
 
