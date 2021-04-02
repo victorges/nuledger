@@ -8,7 +8,7 @@ import (
 
 type doubleTransactionKey struct {
 	Merchant string
-	Amount   int
+	Amount   int64
 }
 
 type NoDoubleTransaction struct {
