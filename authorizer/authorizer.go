@@ -1,17 +1,11 @@
 package authorizer
 
 import (
-	"fmt"
+	"nuledger/authorizer/rules"
 	"nuledger/model"
 	"nuledger/model/violation"
 	"time"
 )
-
-type CommitFunc func()
-
-type Rule interface {
-	Validate(transaction *model.Transaction) (CommitFunc, error)
-}
 
 type doubleTransactionKey struct {
 	Merchant string
@@ -22,13 +16,14 @@ type Authorizer struct {
 	accountState     *model.Account
 	globalLimiter    *RateLimiter
 	doubleTxLimiters map[doubleTransactionKey]*RateLimiter
-	lastTxTime       time.Time
+	rules            []rules.Rule
 }
 
 func NewAuthorizer() *Authorizer {
 	return &Authorizer{
 		globalLimiter:    NewRateLimiter(3, 2*time.Minute),
 		doubleTxLimiters: map[doubleTransactionKey]*RateLimiter{},
+		rules:            rules.Default(),
 	}
 }
 
@@ -44,12 +39,24 @@ func (a *Authorizer) CreateAccount(account *model.Account) (model.Account, error
 }
 
 func (a *Authorizer) PerformTransaction(transaction *model.Transaction) (model.Account, error) {
-	if transaction.Time.Before(a.lastTxTime) {
-		return model.Account{}, fmt.Errorf("Transactions must be sent in chronological order. Received %v after %v", transaction.Time, a.lastTxTime)
+	var (
+		commitFuncs = make([]rules.CommitFunc, 0, 2)
+		errs        []error
+	)
+	for _, rule := range a.rules {
+		commit, err := rule.Validate(transaction)
+		if commit != nil {
+			commitFuncs = append(commitFuncs, commit)
+		}
+		if err != nil {
+			errs = append(errs, err)
+		}
 	}
-	a.lastTxTime = transaction.Time
+	if len(errs) > 0 {
+		// TODO: Aggregate errors
+		return model.Account{}, errs[0]
+	}
 
-	// TODO: Create some kind of authorization rule interface to abstract each of these validations.
 	account := a.accountState
 	if account == nil {
 		err := violation.NewError(violation.AccountNotInitialized, "Account hasn't been initialized")
@@ -76,6 +83,9 @@ func (a *Authorizer) PerformTransaction(transaction *model.Transaction) (model.A
 	a.globalLimiter.Take(transaction.Time)
 	doubleTxLimiter.Take(transaction.Time)
 	account.AvailableLimit -= transaction.Amount
+	for _, commit := range commitFuncs {
+		commit()
+	}
 	return *account, nil
 }
 
