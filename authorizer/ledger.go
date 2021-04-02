@@ -15,16 +15,16 @@ func NewLedger(rules rule.List) *Ledger {
 	return &Ledger{rules: rules}
 }
 
-func (l *Ledger) CreateAccount(account *model.Account) (*model.Account, error) {
+func (l *Ledger) CreateAccount(account model.Account) (*model.Account, error) {
 	if l.accountState != nil {
 		return l.accountState.Copy(), violation.ErrorAccountAlreadyInitialized
 	}
 
-	l.accountState = account.Copy()
-	return account, nil
+	l.accountState = &account
+	return l.accountState.Copy(), nil
 }
 
-func (l *Ledger) PerformTransaction(transaction *model.Transaction) (*model.Account, error) {
+func (l *Ledger) PerformTransaction(transaction model.Transaction) (*model.Account, error) {
 	if l.accountState == nil {
 		return nil, violation.ErrorAccountNotInitialized
 	}

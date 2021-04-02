@@ -34,9 +34,9 @@ func (h *Handler) Handle(op iop.OperationInput) (iop.StateOutput, error) {
 	var account *model.Account
 	switch opType {
 	case operationTypeCreateAccount:
-		account, err = h.CreateAccount(op.Account)
+		account, err = h.CreateAccount(*op.Account)
 	case operationTypePerformTransaction:
-		account, err = h.PerformTransaction(op.Transaction)
+		account, err = h.PerformTransaction(*op.Transaction)
 	default:
 		return iop.StateOutput{}, errors.New("Internal error: Unknown operation type")
 	}

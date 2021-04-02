@@ -7,7 +7,7 @@ type List []Authorizer
 // Ensure List implements of Rule interface
 var _ Authorizer = List(nil)
 
-func (l List) Authorize(account model.Account, transaction *model.Transaction) (CommitFunc, error) {
+func (l List) Authorize(account model.Account, transaction model.Transaction) (CommitFunc, error) {
 	var (
 		commitFuncs = make([]CommitFunc, 0, 2)
 		errs        []error

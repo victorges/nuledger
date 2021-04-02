@@ -17,8 +17,8 @@ func NewNoDoubleTransaction(interval time.Duration) rule.Authorizer {
 	return &NoDoubleTransaction{interval, map[doubleTransactionKey]*util.RateLimiter{}}
 }
 
-func (d *NoDoubleTransaction) Authorize(_ model.Account, transaction *model.Transaction) (rule.CommitFunc, error) {
-	limiter := d.getLimiter(transaction)
+func (d *NoDoubleTransaction) Authorize(_ model.Account, transaction model.Transaction) (rule.CommitFunc, error) {
+	limiter := d.getLimiter(&transaction)
 	if !limiter.Allows(transaction.Time) {
 		return nil, violation.ErrorDoubleTransaction
 	}
