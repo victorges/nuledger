@@ -3,6 +3,7 @@ package authorizer
 import (
 	"errors"
 	"fmt"
+	"nuledger/authorizer/util"
 	"nuledger/iop"
 	"nuledger/model"
 	"nuledger/model/violation"
@@ -64,7 +65,7 @@ func extractViolations(err error) ([]violation.Code, error) {
 	if errors.As(err, &verr) {
 		return []violation.Code{verr.Code}, nil
 	}
-	var aggErr model.AggregateError
+	var aggErr util.AggregateError
 	if !errors.As(err, &aggErr) {
 		return []violation.Code{}, err
 	}
@@ -80,5 +81,5 @@ func extractViolations(err error) ([]violation.Code, error) {
 			fatalErrs = append(fatalErrs, innerErr)
 		}
 	}
-	return violations, model.AggregateErrors(fatalErrs)
+	return violations, util.AggregateErrors(fatalErrs)
 }

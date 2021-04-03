@@ -1,6 +1,9 @@
 package rule
 
-import "nuledger/model"
+import (
+	"nuledger/authorizer/util"
+	"nuledger/model"
+)
 
 // List is a helper type to allow the use of a slice of Authorizer objects as if
 // it were a single Authorizer.
@@ -27,7 +30,7 @@ func (l List) Authorize(account model.Account, transaction model.Transaction) (C
 			errs = append(errs, err)
 		}
 	}
-	return combine(commitFuncs), model.AggregateErrors(errs)
+	return combine(commitFuncs), util.AggregateErrors(errs)
 }
 
 func combine(funcs []CommitFunc) CommitFunc {
