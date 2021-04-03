@@ -16,7 +16,7 @@ func NewRateLimiter(maxEvents int, interval time.Duration) *RateLimiter {
 }
 
 func (l *RateLimiter) Take(event time.Time) bool {
-	l.popEventsBefore(event.Add(-l.interval))
+	l.popEventsNotAfter(event.Add(-l.interval))
 	if l.pastEvents.Len() >= l.maxEvents {
 		return false
 	}
@@ -25,25 +25,25 @@ func (l *RateLimiter) Take(event time.Time) bool {
 }
 
 func (l *RateLimiter) Allows(event time.Time) bool {
-	return l.countEventsNotBefore(event.Add(-l.interval)) < l.maxEvents
+	return l.countEventsAfter(event.Add(-l.interval)) < l.maxEvents
 }
 
-func (l *RateLimiter) popEventsBefore(threshold time.Time) {
+func (l *RateLimiter) popEventsNotAfter(threshold time.Time) {
 	for l.pastEvents.Len() > 0 {
 		elm := l.pastEvents.Front()
 		value := elm.Value.(time.Time)
-		if !value.Before(threshold) {
+		if value.After(threshold) {
 			break
 		}
 		l.pastEvents.Remove(elm)
 	}
 }
 
-func (l *RateLimiter) countEventsNotBefore(threshold time.Time) int {
+func (l *RateLimiter) countEventsAfter(threshold time.Time) int {
 	count := 0
 	for elm := l.pastEvents.Back(); elm != nil; elm = elm.Prev() {
 		value := elm.Value.(time.Time)
-		if value.Before(threshold) {
+		if !value.After(threshold) {
 			break
 		}
 		count++
