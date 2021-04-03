@@ -1,12 +1,17 @@
+BUILD_DIR=./build
 
-build:
-	go build
+build: clean
+	mkdir $(BUILD_DIR)
+	go build -o $(BUILD_DIR)/authorizer
+
+clean:
+	rm -rf $(BUILD_DIR)
 
 run:
 	go run main.go
 
 test: build	
-	./test.fish
+	./test.fish $(BUILD_DIR)/authorizer
 
 doc:
 	@echo "Serving documentation...\n"
