@@ -4,7 +4,7 @@ import "nuledger/model"
 
 type List []Authorizer
 
-// Ensure List implements of Rule interface
+// Ensure List implements the Authorizer interface
 var _ Authorizer = List(nil)
 
 func (l List) Authorize(account model.Account, transaction model.Transaction) (CommitFunc, error) {
