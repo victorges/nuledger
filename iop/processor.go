@@ -1,3 +1,5 @@
+// Package iop contains the lower-level Input/Output processing logic of the
+// authorizer application.
 package iop
 
 import (
@@ -22,6 +24,9 @@ type IOProcessor struct {
 	handler DataHandler
 }
 
+// NewProcessor creates an IOProcessor that reads from the provided io.Reader,
+// transforms the data through the provided DataHandler and writes the result to
+// the provided io.Writer.
 func NewProcessor(in io.Reader, out io.Writer, handler DataHandler) *IOProcessor {
 	return &IOProcessor{
 		in:      json.NewDecoder(in),
@@ -30,6 +35,9 @@ func NewProcessor(in io.Reader, out io.Writer, handler DataHandler) *IOProcessor
 	}
 }
 
+// Process reads from the input stream, processes it with the data handler and
+// writes to the output stream until either an error occurs or it reaches the
+// end of the stream (io.EOF).
 func (p *IOProcessor) Process() error {
 	for {
 		var op OperationInput
