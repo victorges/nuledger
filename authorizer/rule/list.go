@@ -1,8 +1,8 @@
 package rule
 
 import (
-	"nuledger/authorizer/util"
 	"nuledger/model"
+	"nuledger/util"
 )
 
 // List is a helper type to allow the use of a slice of Authorizer objects as if

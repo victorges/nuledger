@@ -1,5 +1,5 @@
 // Package util defines some more generic utilities that can be used in the core
-// business logic of the authorizer/ledger components.
+// business logic of the application.
 package util
 
 import (

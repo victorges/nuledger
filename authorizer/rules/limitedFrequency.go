@@ -2,9 +2,9 @@ package rules
 
 import (
 	"nuledger/authorizer/rule"
-	"nuledger/authorizer/util"
 	"nuledger/model"
 	"nuledger/model/violation"
+	"nuledger/util"
 	"time"
 )
 

@@ -3,10 +3,10 @@ package authorizer
 import (
 	"errors"
 	"fmt"
-	"nuledger/authorizer/util"
 	"nuledger/iop"
 	"nuledger/model"
 	"nuledger/model/violation"
+	"nuledger/util"
 )
 
 type Handler struct {
