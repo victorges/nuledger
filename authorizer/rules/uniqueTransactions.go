@@ -47,7 +47,7 @@ func (d *UniqueTransactions) getLimiter(transaction *model.Transaction) *util.Ra
 	key := doubleTransactionKey{transaction.Merchant, transaction.Amount}
 	limiter := d.limiters[key]
 	if limiter == nil {
-		limiter = util.NewRateLimiter(1, d.doubleTxInterval)
+		limiter = &util.RateLimiter{MaxEvents: 1, Interval: d.doubleTxInterval}
 		d.limiters[key] = limiter
 	}
 	return limiter
