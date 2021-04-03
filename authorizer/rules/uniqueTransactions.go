@@ -19,7 +19,7 @@ type UniqueTransactions struct {
 
 // NewUniqueTransactions returns a UniqueTransactions authorizer with the given
 // configuration. The `interval` is the minimum amount of time between two
-// transactions with everything else equal for them not be considered double.
+// transactions with everything else equal for them not to glbe considered double.
 func NewUniqueTransactions(interval time.Duration) *UniqueTransactions {
 	return &UniqueTransactions{interval, map[doubleTransactionKey]*util.RateLimiter{}}
 }

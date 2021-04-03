@@ -15,7 +15,7 @@ var _ Authorizer = List(nil)
 // Authorize function from List type calls every authorizer in the slice and
 // combines both the returned commit functions into a single CommitFunc which
 // calls all of the original ones, and the returned errors into a possible
-// model.AggregateError in case multiple errors were returned.
+// util.AggregateError in case multiple errors were returned.
 func (l List) Authorize(account model.Account, transaction model.Transaction) (CommitFunc, error) {
 	var (
 		commitFuncs = make([]CommitFunc, 0, 5)

@@ -2,8 +2,8 @@
 // violations in the authorizer business logic.
 package violation
 
-// Code represents a violation code to be included in the output messages
-// respective to the well-defined errors processing requested operations.
+// Code is an enum to represent each of the well-known violation codes that can
+// be included in the output messages.
 type Code string
 
 const (

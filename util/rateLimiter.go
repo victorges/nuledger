@@ -1,5 +1,5 @@
-// Package util defines some more generic utilities that can be used in the core
-// business logic of the application.
+// Package util defines some generic components useful to the core business
+// logic of the application.
 package util
 
 import (
@@ -46,9 +46,8 @@ func (l *RateLimiter) Allows(event time.Time) bool {
 }
 
 // Take actually updates the internal state of the rate limiter in order to
-// consider the given as event as having happened. It still checks whether the
-// event is actually allowed and returns whether the event was actually taken or
-// not.
+// consider the given event as having happened. It still checks if the event is
+// actually allowed and thus returns whether the event was taken or not.
 //
 // If the same event is sent to the Allows function and no other change has been
 // made to the rate limiter, Take is guaranteed to return the same result. In

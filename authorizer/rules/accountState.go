@@ -1,5 +1,5 @@
-// Package rules defines actual implementations of some rule.Authorizers, to be
-// used by a transaction performing agent for authorizing transactions on an
+// Package rules defines actual implementations of some rule authorizers. Should
+// be used by a transaction performing agent for authorizing transactions on an
 // account.
 package rules
 

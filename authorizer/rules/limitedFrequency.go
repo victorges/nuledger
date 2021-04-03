@@ -16,7 +16,7 @@ type LimitedFrequency struct {
 
 // NewLimitedFrequency returns a LimitedFrequency authorizer with the given
 // configuration. The arguments of the constructor configures it so that at most
-// `maxTransactions` are performed under the given `interval`.
+// `maxTransactions` are authorized under the given `interval`.
 func NewLimitedFrequency(maxTransactions int, interval time.Duration) *LimitedFrequency {
 	return &LimitedFrequency{
 		limiter: util.RateLimiter{

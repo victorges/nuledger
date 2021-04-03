@@ -5,7 +5,11 @@ package model
 // as well as the account creation object representing its initial state. In a
 // multi-account setup, it should include some ID of the account.
 type Account struct {
-	ActiveCard     bool  `json:"active-card"`
+	// ActiveCard represents if the account card is active or not. An inactive
+	// card does not authorize any transactions.
+	ActiveCard bool `json:"active-card"`
+	// AvailableLimit is the units of currency that the account still has.
+	// Transactions consume from this limit and it can never be exceeded.
 	AvailableLimit int64 `json:"available-limit"`
 }
 

@@ -1,5 +1,5 @@
 // Package iop contains the lower-level Input/Output processing logic of the
-// authorizer application.
+// application.
 package iop
 
 import (
@@ -37,7 +37,8 @@ func NewProcessor(in io.Reader, out io.Writer, handler DataHandler) *IOProcessor
 
 // Process reads from the input stream, processes it with the data handler and
 // writes to the output stream until either an error occurs or it reaches the
-// end of the stream (io.EOF).
+// end of the stream (io.EOF). An EOF is considered a non-error, the happy path,
+// so that's the only case where a nil error will be returned by this function.
 func (p *IOProcessor) Process() error {
 	for {
 		var op OperationInput
