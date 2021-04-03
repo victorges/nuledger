@@ -2,6 +2,11 @@ package rule
 
 import "nuledger/model"
 
+// List is a helper type to allow the use of a slice of Authorizer objects as if
+// it were a single Authorizer. It's Authorize function calls every authorizer
+// in the slice and combines both the returned commit functions into a single
+// CommitFunc which calls all of the original ones and the returned errors into
+// a possible model.AggregateError in case multiple errors were returned.
 type List []Authorizer
 
 // Ensure List implements the Authorizer interface
@@ -9,7 +14,7 @@ var _ Authorizer = List(nil)
 
 func (l List) Authorize(account model.Account, transaction model.Transaction) (CommitFunc, error) {
 	var (
-		commitFuncs = make([]CommitFunc, 0, 2)
+		commitFuncs = make([]CommitFunc, 0, 5)
 		errs        []error
 	)
 	for _, rule := range l {
