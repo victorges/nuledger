@@ -1,5 +1,7 @@
 BUILD_DIR=./build
 
+export GOPROXY=https://proxy.golang.org,https://goproxy.io,direct
+
 build: clean
 	mkdir $(BUILD_DIR)
 	go build -o $(BUILD_DIR)/authorizer
