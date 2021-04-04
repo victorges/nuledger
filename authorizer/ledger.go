@@ -12,6 +12,8 @@ import (
 	"nuledger/model/violation"
 )
 
+//go:generate ../gen_mocks.sh ledger.go
+
 // Ledger is the main component responsible for managing the account and
 // performing transactions on it.
 type Ledger interface {

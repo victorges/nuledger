@@ -12,8 +12,11 @@ clean:
 run:
 	go run main.go
 
-test:	
+test:
 	go test
+
+generate:
+	go generate ./...
 
 doc:
 	@echo "Starting documentation server (godoc)..."

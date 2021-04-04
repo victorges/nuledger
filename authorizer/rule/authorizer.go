@@ -6,6 +6,8 @@ import (
 	"nuledger/model"
 )
 
+//go:generate ../../gen_mocks.sh authorizer.go
+
 // An Authorizer enforces a rule when performing a transaction on an account.
 //
 // Authorize should return an error if the rule is broken, which can be of type
