@@ -42,7 +42,9 @@ func TestInputOutputCases(t *testing.T) {
 
 func listSubDirs(path string) []string {
 	files, err := ioutil.ReadDir(path)
-	panicIfErr(err)
+	if err != nil {
+		panic(err)
+	}
 
 	subdirs := make([]string, len(files))
 	for i, file := range files {
@@ -63,7 +65,7 @@ func getTestCase(caseName string) (input io.Reader, expectedOutput io.Reader) {
 
 func readFile(path string) io.Reader {
 	content, err := ioutil.ReadFile(path)
-	panicIfErr(err)
+	So(err, ShouldBeNil)
 	return bytes.NewReader(content)
 }
 
@@ -73,12 +75,6 @@ func readLines(in io.Reader) []string {
 	for scanner.Scan() {
 		lines = append(lines, scanner.Text())
 	}
-	panicIfErr(scanner.Err())
+	So(scanner.Err(), ShouldBeNil)
 	return lines
-}
-
-func panicIfErr(err error) {
-	if err != nil {
-		panic(err)
-	}
 }

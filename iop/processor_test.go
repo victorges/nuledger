@@ -3,6 +3,8 @@ package iop_test
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
+	"io"
 	"nuledger/iop"
 	mock_iop "nuledger/mocks/iop"
 	"nuledger/model"
@@ -17,43 +19,118 @@ import (
 var startTime = time.Date(2021, time.March, 31, 14, 57, 55, 0, time.Local)
 
 func TestIOProcessor(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
+	Convey("Given an Input/Output Processor", t, func() {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
 
-	Convey("Input/Output Processor", t, func() {
 		handler := mock_iop.NewMockDataHandler(ctrl)
 
 		in, out := bytes.NewBuffer(nil), bytes.NewBuffer(nil)
 		processor := iop.NewProcessor(in, out, handler)
 
-		Convey("Does no-op on no input", func() {
+		test := func(expectedOutputs int, inputs ...iop.OperationInput) ([]iop.StateOutput, error) {
+			writeInputs(in, inputs...)
 			err := processor.Process()
+			return readOutputs(out, expectedOutputs), err
+		}
+
+		Convey("When it gets no input it should do nothing", func() {
+			output, err := test(0)
 			So(err, ShouldBeNil)
-			So(out.Len(), ShouldEqual, 0)
+			So(output, ShouldBeEmpty)
 		})
 
-		Convey("Forwards read and received objects with no change", func() {
+		Convey("When the handler returns an error", func() {
+			input := iop.OperationInput{}
+			expectedOut := make([]iop.StateOutput, 1)
+			expectedErr := errors.New("Custom error")
+
+			handler.EXPECT().
+				Handle(gomock.Eq(input)).
+				Return(expectedOut[0], nil)
+			handler.EXPECT().
+				Handle(gomock.Eq(input)).
+				Return(iop.StateOutput{}, expectedErr)
+
+			Convey("It should stop processing and return error", func() {
+				output, err := test(1, input, input, input)
+				So(output, ShouldResemble, expectedOut)
+				So(err, ShouldNotBeNil)
+				So(errors.Is(err, expectedErr), ShouldBeTrue)
+			})
+		})
+
+		Convey("When objects are read from input and returned by handler", func() {
 			input := iop.OperationInput{
 				Account:     &model.Account{true, 1337},
 				Transaction: &model.Transaction{"sketchy", 420, startTime},
 			}
-			output := iop.StateOutput{
+			expected := iop.StateOutput{
 				Account:    &model.Account{false, 7331},
 				Violations: []violation.Code{"not-even-a-violation"},
 			}
 
 			handler.EXPECT().
 				Handle(gomock.Eq(input)).
-				Return(output, nil)
+				Return(expected, nil)
 
-			err := json.NewEncoder(in).Encode(input)
-			So(err, ShouldBeNil)
-			err = processor.Process()
-
-			So(err, ShouldBeNil)
-			So(out.Len(), ShouldEqual, 95)
-			// TODO: check output object
+			Convey("It should pass around the exact same objects", func() {
+				output, err := test(1, input)
+				So(err, ShouldBeNil)
+				So(output[0], ShouldResemble, expected)
+			})
 		})
 
+		Convey("When multiple objects are read from input", func() {
+			input := []iop.OperationInput{
+				{Account: &model.Account{AvailableLimit: 42}},
+				{Transaction: &model.Transaction{Amount: 23}},
+			}
+			expected := []iop.StateOutput{
+				{Account: &model.Account{true, 13}},
+				{Violations: []violation.Code{"surely-another-non-violation"}},
+			}
+
+			calls := make([]*gomock.Call, len(input))
+			for i := range calls {
+				calls[i] = handler.EXPECT().
+					Handle(gomock.Eq(input[i])).
+					Return(expected[i], nil)
+			}
+			gomock.InOrder(calls...)
+
+			Convey("It should successfully process the multiple entries in order", func() {
+				output, err := test(2, input...)
+				So(err, ShouldBeNil)
+				So(output, ShouldResemble, expected)
+			})
+		})
 	})
+}
+
+func writeInputs(dest io.Writer, values ...iop.OperationInput) {
+	enc := json.NewEncoder(dest)
+	for _, value := range values {
+		err := enc.Encode(value)
+		So(err, ShouldBeNil)
+	}
+}
+
+func readOutputs(src io.Reader, count int) []iop.StateOutput {
+	values := make([]iop.StateOutput, 0, count)
+
+	dec := json.NewDecoder(src)
+	for {
+		var value iop.StateOutput
+		err := dec.Decode(&value)
+		if err == io.EOF {
+			break
+		}
+		So(err, ShouldBeNil)
+
+		values = append(values, value)
+	}
+	So(len(values), ShouldEqual, count)
+
+	return values
 }
