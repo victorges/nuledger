@@ -5,10 +5,19 @@ import (
 	"strings"
 )
 
+// AggregateError is a type for representing multiple errors as a single one.
+// Meant for multiplexed or even parallelized operations that may have multiple
+// errors to return while consumers still may need to process each of the errors
+// separately.
 type AggregateError struct {
 	Errors []error
 }
 
+// AggregateErrors receives a slice of errors and returns an appropriate
+// representation of them as a single error. For an empty slice, it returns a
+// nil error; for a slice with only 1 element, it returns that single error; and
+// finally for bigger slices, it returns an AggregateError object containing all
+// the errors in the slice.
 func AggregateErrors(errs []error) error {
 	if count := len(errs); count == 0 {
 		return nil
@@ -18,6 +27,8 @@ func AggregateErrors(errs []error) error {
 	return AggregateError{errs}
 }
 
+// Error implements the error interface. It combines the error messages of all
+// the aggregated errors and returns a single string representing them.
 func (a AggregateError) Error() string {
 	msgs := make([]string, len(a.Errors))
 	for i, err := range a.Errors {
