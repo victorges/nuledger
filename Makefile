@@ -15,6 +15,9 @@ run:
 test:
 	go test ./...
 
+test_server:
+	go run github.com/smartystreets/goconvey
+
 generate:
 	go generate ./...
 

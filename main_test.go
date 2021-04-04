@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"bytes"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"path"
@@ -19,25 +20,24 @@ const (
 
 func TestInputOutputCases(t *testing.T) {
 	cases := listSubDirs(baseTestCasesDir)
-	for _, caseName := range cases {
-		inputFile := path.Join(baseTestCasesDir, caseName, inputFileName)
-		outputFile := path.Join(baseTestCasesDir, caseName, outputFileName)
 
-		input := readFile(inputFile)
-		expected := readLines(readFile(outputFile))
+	Convey("Authorizer application", t, func() {
+		for _, caseName := range cases {
+			Convey(fmt.Sprintf(`Correctly handles test case "%s"`, caseName), func() {
+				input, expectedBuf := getTestCase(caseName)
 
-		Convey("Authorizer handles "+caseName, t, func() {
-			outputBuf := bytes.NewBuffer(nil)
-			mainCore(input, outputBuf)
+				outputBuf := bytes.NewBuffer(nil)
+				mainCore(input, outputBuf)
 
-			output := readLines(outputBuf)
+				output, expected := readLines(outputBuf), readLines(expectedBuf)
 
-			So(len(output), ShouldEqual, len(expected))
-			for i, line := range output {
-				So(line, ShouldEqual, expected[i])
-			}
-		})
-	}
+				So(len(output), ShouldEqual, len(expected))
+				for i, line := range output {
+					So(line, ShouldEqual, expected[i])
+				}
+			})
+		}
+	})
 }
 
 func listSubDirs(path string) []string {
@@ -52,6 +52,13 @@ func listSubDirs(path string) []string {
 		subdirs[i] = file.Name()
 	}
 	return subdirs
+}
+
+func getTestCase(caseName string) (input io.Reader, expectedOutput io.Reader) {
+	inputFile := path.Join(baseTestCasesDir, caseName, inputFileName)
+	outputFile := path.Join(baseTestCasesDir, caseName, outputFileName)
+
+	return readFile(inputFile), readFile(outputFile)
 }
 
 func readFile(path string) io.Reader {
