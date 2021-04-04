@@ -10,10 +10,10 @@ clean:
 run:
 	go run main.go
 
-test: build	
-	./test.fish $(BUILD_DIR)/authorizer
+test:	
+	go test
 
 doc:
-	@echo "Serving documentation...\n"
-	@sleep 1 && echo "\nRead project documentation under http://localhost:6060/pkg/nuledger" &
+	@echo "Starting documentation server (godoc)..."
+	@echo "Read project documentation under http://localhost:6060/pkg/nuledger\n"
 	godoc -http=localhost:6060

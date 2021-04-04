@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io"
 	"os"
 
 	"nuledger/authorizer"
@@ -8,7 +9,11 @@ import (
 )
 
 func main() {
-	processor := iop.NewProcessor(os.Stdin, os.Stdout, authorizer.NewHandler())
+	mainCore(os.Stdin, os.Stdout)
+}
+
+func mainCore(in io.Reader, out io.Writer) {
+	processor := iop.NewProcessor(in, out, authorizer.NewHandler())
 	if err := processor.Process(); err != nil {
 		panic(err)
 	}
