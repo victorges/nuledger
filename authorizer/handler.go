@@ -14,7 +14,7 @@ import (
 // the account state and performs transactions. It basically interprets the JSON
 // objects received and calls the correct higher-level APIs from the Ledger.
 type Handler struct {
-	*Ledger
+	Ledger
 }
 
 // NewHandler creates a new Handler with a Ledger with all the default
