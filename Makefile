@@ -13,10 +13,10 @@ run:
 	go run main.go
 
 test:
-	go test ./...
+	go test `go list ./... | grep -v mocks`
 
 test_server:
-	go run github.com/smartystreets/goconvey
+	go run github.com/smartystreets/goconvey -excludedDirs=testcases,mocks,build
 
 generate:
 	go generate ./...

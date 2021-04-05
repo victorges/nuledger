@@ -22,6 +22,11 @@ func TestInputOutputCases(t *testing.T) {
 	cases := listSubDirs(baseTestCasesDir)
 
 	Convey("Authorizer application", t, func() {
+		Convey("Panics in case of error", func() {
+			input, output := bytes.NewReader([]byte(`not a json`)), bytes.NewBuffer(nil)
+			So(func() { mainCore(input, output) }, ShouldPanic)
+		})
+
 		for _, caseName := range cases {
 			Convey(fmt.Sprintf(`Correctly handles test case "%s"`, caseName), func() {
 				input, expectedBuf := getTestCase(caseName)

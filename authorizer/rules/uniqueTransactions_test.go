@@ -66,6 +66,11 @@ func TestUniqueTransactions(t *testing.T) {
 					otherAmount.Amount = 2 * baseTransacton.Amount
 					testSuccess(otherAmount)
 				})
+				Convey("Transactions immediately after the interval", func() {
+					periodicTransaction := baseTransacton
+					periodicTransaction.Time = uniqueStartTime.Add(interval)
+					testSuccess(periodicTransaction)
+				})
 				Convey("Transactions after the interval", func() {
 					validTransaction := baseTransacton
 					validTransaction.Time = uniqueStartTime.Add(interval + 1)
