@@ -32,7 +32,7 @@ func TestLimitedFrequency(t *testing.T) {
 			}
 
 			Convey("Then it should still authorize unlimited transactions if the commitFunc is not called", func() {
-				for i := 0; i < 100*maxTxs; i++ {
+				for i := 0; i < 10*maxTxs; i++ {
 					authzer.Authorize(model.Account{}, genTransaction(0))
 				}
 				testSuccess(baseTransacton)
@@ -55,7 +55,7 @@ func TestLimitedFrequency(t *testing.T) {
 				Convey("Any amount of transactions with a minimal period", func() {
 					period := interval / time.Duration(maxTxs)
 					totalDiff := period
-					for i := 0; i < 100*maxTxs; i++ {
+					for i := 0; i < 10*maxTxs; i++ {
 						testSuccess(genTransaction(totalDiff))
 						totalDiff += period
 					}
