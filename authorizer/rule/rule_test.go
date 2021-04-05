@@ -19,6 +19,21 @@ var (
 	dummyTransaction = model.Transaction{Merchant: "Sketchy", Amount: 123, Time: startTime}
 )
 
+func TestAuthorizerFunc(t *testing.T) {
+	Convey("Given an authorizer func", t, func() {
+		callCount := 0
+		authFunc := rule.AuthorizerFunc(func(_ model.Account, _ model.Transaction) (rule.CommitFunc, error) {
+			callCount++
+			return nil, nil
+		})
+
+		Convey("It should call function on authorize", func() {
+			authFunc.Authorize(model.Account{}, model.Transaction{})
+			So(callCount, ShouldEqual, 1)
+		})
+	})
+}
+
 func TestRuleList(t *testing.T) {
 	Convey("Given a rule List", t, func() {
 		ctrl := gomock.NewController(t)

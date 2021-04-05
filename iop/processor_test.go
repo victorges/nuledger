@@ -40,6 +40,36 @@ func TestIOProcessor(t *testing.T) {
 			So(output, ShouldBeEmpty)
 		})
 
+		Convey("When it gets an I/O error", func() {
+			pipeIn, pipeOut := io.Pipe()
+			defer pipeIn.Close()
+			defer pipeOut.Close()
+
+			testIOErr := func(in io.Reader, out io.Writer, expectedErr error) {
+				processor = iop.NewProcessor(in, out, handler)
+				output, err := test(0, iop.OperationInput{})
+				So(output, ShouldBeEmpty)
+				So(errors.Is(err, expectedErr), ShouldBeTrue)
+			}
+
+			Convey("It propagates input errors", func() {
+				inputErr := errors.New("The input error")
+				pipeOut.CloseWithError(inputErr)
+
+				testIOErr(pipeIn, out, inputErr)
+			})
+			Convey("It propagates output errors", func() {
+				outputErr := errors.New("The output error")
+				pipeIn.CloseWithError(outputErr)
+
+				handler.EXPECT().
+					Handle(gomock.Eq(iop.OperationInput{})).
+					Return(iop.StateOutput{}, nil)
+
+				testIOErr(in, pipeOut, outputErr)
+			})
+		})
+
 		Convey("When the handler returns an error", func() {
 			input := iop.OperationInput{}
 			expectedOut := make([]iop.StateOutput, 1)

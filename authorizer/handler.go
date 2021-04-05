@@ -39,8 +39,6 @@ func (h *Handler) Handle(op iop.OperationInput) (iop.StateOutput, error) {
 		account, err = h.CreateAccount(*op.Account)
 	case operationTypePerformTransaction:
 		account, err = h.PerformTransaction(*op.Transaction)
-	default:
-		return iop.StateOutput{}, errors.New("Internal error: Unknown operation type")
 	}
 
 	violations, err := extractViolations(err)

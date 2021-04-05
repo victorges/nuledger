@@ -8,12 +8,13 @@ import (
 	"nuledger/iop"
 )
 
-func main() {
-	mainCore(os.Stdin, os.Stdout)
-}
+var (
+	stdin  io.Reader = os.Stdin
+	stdout io.Writer = os.Stdout
+)
 
-func mainCore(in io.Reader, out io.Writer) {
-	processor := iop.NewProcessor(in, out, authorizer.NewHandler())
+func main() {
+	processor := iop.NewProcessor(stdin, stdout, authorizer.NewHandler())
 	if err := processor.Process(); err != nil {
 		panic(err)
 	}

@@ -2,7 +2,10 @@ package authorizer_test
 
 import (
 	"errors"
+	"fmt"
 	"nuledger/authorizer"
+	"nuledger/authorizer/rule"
+	"nuledger/authorizer/rules"
 	"nuledger/iop"
 	mock_authorizer "nuledger/mocks/authorizer"
 	"nuledger/model"
@@ -148,6 +151,51 @@ func TestHandlerBadInput(t *testing.T) {
 			})
 		})
 	})
+}
+
+func TestDefaultAuthorizers(t *testing.T) {
+	Convey("Given the default authorizers", t, func() {
+		authzer := authorizer.DefaultAuthorizer()
+
+		Convey("They should be a rule list", func() {
+			So(authzer, ShouldHaveSameTypeAs, rule.List{})
+
+			list := authzer.(rule.List)
+
+			Convey("With all required authorization rules", func() {
+				So(list, ShouldHaveLength, 5)
+				So(list, ShouldContain, &rules.ChronologicalOrder{})
+				So(list, ShouldContain, rules.NewLimitedFrequency(3, 2*time.Minute))
+				So(list, ShouldContain, rules.NewUniqueTransactions(2*time.Minute))
+				So(containsAuthFunc(list, rules.AccountCardActive), ShouldBeTrue)
+				So(containsAuthFunc(list, rules.SufficientLimit), ShouldBeTrue)
+			})
+		})
+	})
+
+	Convey("Given a default handler", t, func() {
+		handler := authorizer.NewHandler()
+		_, err := handler.Handle(iop.OperationInput{Account: &model.Account{}})
+		So(err, ShouldBeNil)
+
+		Convey("It should use the default authorizers", func() {
+			expected := iop.StateOutput{Account: &model.Account{}, Violations: []violation.Code{violation.CardNotActive}}
+			output, err := handler.Handle(iop.OperationInput{Transaction: &model.Transaction{}})
+			So(err, ShouldBeNil)
+			So(output, ShouldResemble, expected)
+		})
+	})
+}
+
+func containsAuthFunc(list rule.List, authFunc rule.AuthorizerFunc) bool {
+	for _, auth := range list {
+		if elmFunc, isFunc := auth.(rule.AuthorizerFunc); isFunc {
+			if fmt.Sprint(authFunc) == fmt.Sprint(elmFunc) {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 func testHandlerOperations(ctrl *gomock.Controller, validate func(iop.StateOutput, error), returnAccount *model.Account, returnErr error) {

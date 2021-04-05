@@ -24,7 +24,7 @@ func TestInputOutputCases(t *testing.T) {
 	Convey("Authorizer application", t, func() {
 		Convey("Panics in case of error", func() {
 			input, output := bytes.NewReader([]byte(`not a json`)), bytes.NewBuffer(nil)
-			So(func() { mainCore(input, output) }, ShouldPanic)
+			So(func() { testMain(input, output) }, ShouldPanic)
 		})
 
 		for _, caseName := range cases {
@@ -32,17 +32,21 @@ func TestInputOutputCases(t *testing.T) {
 				input, expectedBuf := getTestCase(caseName)
 
 				outputBuf := bytes.NewBuffer(nil)
-				mainCore(input, outputBuf)
+				testMain(input, outputBuf)
 
 				output, expected := readLines(outputBuf), readLines(expectedBuf)
-
-				So(len(output), ShouldEqual, len(expected))
-				for i, line := range output {
-					So(line, ShouldEqual, expected[i])
-				}
+				So(output, ShouldResemble, expected)
 			})
 		}
 	})
+}
+
+func testMain(in io.Reader, out io.Writer) {
+	prevIn, prevOut := stdin, stdout
+	defer func() { stdin, stdout = prevIn, prevOut }()
+
+	stdin, stdout = in, out
+	main()
 }
 
 func listSubDirs(path string) []string {
