@@ -78,6 +78,8 @@ func (l *AuthLedger) PerformTransaction(transaction model.Transaction) (*model.A
 	}
 
 	account.AvailableLimit -= transaction.Amount
-	commitFunc()
+	if commitFunc != nil {
+		commitFunc()
+	}
 	return account.Copy(), nil
 }
