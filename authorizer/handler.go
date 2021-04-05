@@ -80,7 +80,7 @@ func getOperationType(op iop.OperationInput) (operationType, error) {
 // codes that might be represented by it. If there are any errors that are not
 // violation codes they are returned in the second return value.
 func extractViolations(err error) ([]violation.Code, error) {
-	var verr *violation.Error
+	var verr violation.Error
 	if errors.As(err, &verr) {
 		return []violation.Code{verr.Code}, nil
 	}

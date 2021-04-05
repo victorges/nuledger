@@ -12,11 +12,11 @@ type Error struct {
 }
 
 // NewError creates a new violation error with the provided code and message.
-func NewError(code Code, format string, args ...interface{}) error {
-	return &Error{code, fmt.Sprintf(format, args...)}
+func NewError(code Code, format string, args ...interface{}) Error {
+	return Error{code, fmt.Sprintf(format, args...)}
 }
 
 // Error implements the error interface to return the error message as a string.
-func (e *Error) Error() string {
+func (e Error) Error() string {
 	return e.Message
 }
