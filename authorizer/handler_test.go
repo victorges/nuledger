@@ -7,6 +7,7 @@ import (
 	mock_authorizer "nuledger/mocks/authorizer"
 	"nuledger/model"
 	"nuledger/model/violation"
+	"nuledger/util"
 	"testing"
 	"time"
 
@@ -47,6 +48,20 @@ func TestHandler(t *testing.T) {
 					testHandlerOperations(ctrl, validate, nil, violErr)
 				})
 
+				Convey("It should handle aggregated violation errors", func() {
+					returnedError := util.AggregateError{[]error{
+						violation.NewError("custom-validation-code", "Hello violations"),
+						violation.NewError("yet-another-validation-code", "Old friend"),
+					}}
+					expected := iop.StateOutput{Account: nil, Violations: []violation.Code{"custom-validation-code", "yet-another-validation-code"}}
+
+					validate := func(output iop.StateOutput, err error) {
+						So(err, ShouldBeNil)
+						So(output, ShouldResemble, expected)
+					}
+					testHandlerOperations(ctrl, validate, nil, returnedError)
+				})
+
 				Convey("Any other error should be propagated", func() {
 					regularErr := errors.New("This is just a regular error")
 
@@ -56,6 +71,20 @@ func TestHandler(t *testing.T) {
 						So(err, ShouldEqual, regularErr)
 					}
 					testHandlerOperations(ctrl, validate, nil, regularErr)
+				})
+				Convey("Even if aggregated with other violation errors", func() {
+					regularErr := errors.New("This is just a regular error")
+					returnedError := util.AggregateError{[]error{
+						violation.NewError("custom-validation-code", "Hello violations"),
+						regularErr,
+					}}
+
+					validate := func(output iop.StateOutput, err error) {
+						So(err, ShouldNotBeNil)
+						So(output, ShouldBeZeroValue)
+						So(err, ShouldEqual, regularErr)
+					}
+					testHandlerOperations(ctrl, validate, nil, returnedError)
 				})
 			})
 		})
