@@ -16,7 +16,7 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
-var startTime = time.Date(2021, time.March, 31, 14, 57, 55, 0, time.Local)
+var startTime = time.Date(2021, time.March, 31, 17, 57, 55, 0, time.UTC)
 
 func TestIOProcessor(t *testing.T) {
 	Convey("Given an Input/Output Processor", t, func() {

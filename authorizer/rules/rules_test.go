@@ -11,7 +11,7 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
-var startTime = time.Date(2021, time.April, 2, 21, 11, 43, 0, time.Local)
+var startTime = time.Date(2021, time.April, 3, 0, 11, 43, 0, time.UTC)
 
 func TestAccountCardActive(t *testing.T) {
 	Convey("Given AccountCardActive authorizer function", t, func() {

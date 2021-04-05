@@ -11,7 +11,7 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
-var frequencyStartTime = time.Date(2021, time.April, 1, 13, 04, 21, 0, time.Local)
+var frequencyStartTime = time.Date(2021, time.April, 1, 16, 04, 21, 0, time.UTC)
 
 func TestLimitedFrequency(t *testing.T) {
 	Convey("Given LimitedFrequency authorizer", t, func() {

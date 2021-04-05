@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	uniqueStartTime = time.Date(2021, time.April, 1, 13, 05, 19, 0, time.Local)
+	uniqueStartTime = time.Date(2021, time.April, 1, 16, 05, 19, 0, time.UTC)
 	baseTransacton  = model.Transaction{Merchant: "One Merchant", Amount: 1, Time: uniqueStartTime}
 )
 
