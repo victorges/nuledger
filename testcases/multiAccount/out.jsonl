@@ -1,0 +1,7 @@
+{"account":{"id":"1","active-card":true,"available-limit":100},"violations":[]}
+{"account":null,"violations":["account-not-initialized"]}
+{"account":null,"violations":["account-not-initialized"]}
+{"account":{"id":"1","active-card":true,"available-limit":80},"violations":[]}
+{"account":{"id":"2","active-card":true,"available-limit":1000},"violations":[]}
+{"account":{"id":"2","active-card":true,"available-limit":958},"violations":[]}
+{"account":{"id":"1","active-card":true,"available-limit":38},"violations":[]}
