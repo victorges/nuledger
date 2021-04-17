@@ -6,6 +6,9 @@ import "time"
 // information about the merchant, amount to be charged and time. In a multi-
 // account setup it should include some ID of the account doing the transaction.
 type Transaction struct {
+	// AccountID is the unique identifier of the account perforing the
+	// respective transaction.
+	AccountID string `json:"accountId"`
 	// Merchant is a unique string to represent the merchant with which a
 	// transaction is being made.
 	Merchant string `json:"merchant"`

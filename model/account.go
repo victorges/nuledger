@@ -5,6 +5,8 @@ package model
 // as well as the account creation object representing its initial state. In a
 // multi-account setup, it should include some ID of the account.
 type Account struct {
+	// ID is a unique identifier for the respective account.
+	ID string `json:"id,omitempty"`
 	// ActiveCard represents if the account card is active or not. An inactive
 	// card does not authorize any transactions.
 	ActiveCard bool `json:"active-card"`

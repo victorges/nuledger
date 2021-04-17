@@ -92,11 +92,11 @@ func TestIOProcessor(t *testing.T) {
 
 		Convey("When objects are read from input and returned by handler", func() {
 			input := iop.OperationInput{
-				Account:     &model.Account{true, 1337},
-				Transaction: &model.Transaction{"sketchy", 420, startTime},
+				Account:     &model.Account{"", true, 1337},
+				Transaction: &model.Transaction{"", "sketchy", 420, startTime},
 			}
 			expected := iop.StateOutput{
-				Account:    &model.Account{false, 7331},
+				Account:    &model.Account{"", false, 7331},
 				Violations: []violation.Code{"not-even-a-violation"},
 			}
 
@@ -117,7 +117,7 @@ func TestIOProcessor(t *testing.T) {
 				{Transaction: &model.Transaction{Amount: 23}},
 			}
 			expected := []iop.StateOutput{
-				{Account: &model.Account{true, 13}},
+				{Account: &model.Account{"", true, 13}},
 				{Violations: []violation.Code{"surely-another-non-violation"}},
 			}
 

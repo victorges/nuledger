@@ -40,37 +40,38 @@ type Ledger interface {
 // objects by value (otherwise they'd all have to repeat the same not-nil
 // validation themselves).
 func NewLedger(authorizer rule.Authorizer) *AuthLedger {
-	return &AuthLedger{authzer: authorizer}
+	return &AuthLedger{accounts: map[string]*model.Account{}, authzer: authorizer}
 }
 
 // AuthLedger is the implementation of the Ledger interface delegating to a
 // rule.Authorizer to authorize all the transactions. Not to be confused with
 // Heath Ledger actor.
 type AuthLedger struct {
-	accountState *model.Account
-	authzer      rule.Authorizer
+	accounts map[string]*model.Account
+	authzer  rule.Authorizer
 }
 
 // CreateAccount implements the Ledger interface. It currently only supports a
 // single account, so this can be called only once per ledger instance or an
 // account-already-initialized error will be returned.
 func (l *AuthLedger) CreateAccount(account model.Account) (*model.Account, error) {
-	if l.accountState != nil {
-		return l.accountState.Copy(), violation.ErrorAccountAlreadyInitialized
+	id := account.ID
+	if existing := l.accounts[id]; existing != nil {
+		return existing.Copy(), violation.ErrorAccountAlreadyInitialized
 	}
 
-	l.accountState = &account
-	return l.accountState.Copy(), nil
+	l.accounts[id] = &account
+	return account.Copy(), nil
 }
 
 // PerformTransaction implements the Ledger interface. It initially calls the
 // configured authorizer to ensure that the transaction is allowed and then
 // performs it updating the current state of the account.
 func (l *AuthLedger) PerformTransaction(transaction model.Transaction) (*model.Account, error) {
-	if l.accountState == nil {
+	account := l.accounts[transaction.AccountID]
+	if account == nil {
 		return nil, violation.ErrorAccountNotInitialized
 	}
-	account := l.accountState
 
 	commitFunc, err := l.authzer.Authorize(*account, transaction)
 	if err != nil {
