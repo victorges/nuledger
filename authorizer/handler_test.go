@@ -165,8 +165,7 @@ func TestDefaultAuthorizers(t *testing.T) {
 			Convey("With all required authorization rules", func() {
 				So(list, ShouldHaveLength, 5)
 				So(list, ShouldContain, &rules.ChronologicalOrder{})
-				So(list, ShouldContain, rules.NewLimitedFrequency(3, 2*time.Minute))
-				So(freqAnalyzerCount(list), ShouldEqual, 1)
+				So(freqAnalyzerCount(list), ShouldEqual, 2)
 				So(containsAuthFunc(list, rules.AccountCardActive), ShouldBeTrue)
 				So(containsAuthFunc(list, rules.SufficientLimit), ShouldBeTrue)
 			})
