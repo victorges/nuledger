@@ -4,4 +4,4 @@
 {"transaction": {"accountId": "1", "merchant": "Burger King", "amount": 20, "time": "2019-02-13T10:00:02.000Z"}}
 {"account": {"id": "2", "active-card": true, "available-limit": 1000}}
 {"transaction": {"accountId": "2", "merchant": "Bobs", "amount": 42, "time": "2019-02-13T10:01:02.000Z"}}
-{"transaction": {"accountId": "1", "merchant": "Méqui", "amount": 42, "time": "2019-02-13T10:01:03.000Z"}}
+{"transaction": {"accountId": "1", "merchant": "Bobs", "amount": 42, "time": "2019-02-13T10:01:03.000Z"}}

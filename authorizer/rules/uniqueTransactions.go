@@ -37,14 +37,19 @@ func (d *UniqueTransactions) Authorize(_ model.Account, transaction model.Transa
 }
 
 type doubleTransactionKey struct {
-	Merchant string
-	Amount   int64
+	AccountID string
+	Merchant  string
+	Amount    int64
 }
 
 // getLimiter tries to get the existing rate limiter for a given transaction and
 // creates a new one if there is none yet.
 func (d *UniqueTransactions) getLimiter(transaction *model.Transaction) *util.RateLimiter {
-	key := doubleTransactionKey{transaction.Merchant, transaction.Amount}
+	key := doubleTransactionKey{
+		AccountID: transaction.AccountID,
+		Merchant:  transaction.Merchant,
+		Amount:    transaction.Amount,
+	}
 	limiter := d.limiters[key]
 	if limiter == nil {
 		limiter = &util.RateLimiter{MaxEvents: 1, Interval: d.doubleTxInterval}
