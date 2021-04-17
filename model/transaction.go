@@ -3,8 +3,7 @@ package model
 import "time"
 
 // Transaction is an authorization request for a transaction, consisting of
-// information about the merchant, amount to be charged and time. In a multi-
-// account setup it should include some ID of the account doing the transaction.
+// information about the merchant, amount to be charged and time.
 type Transaction struct {
 	// AccountID is the unique identifier of the account perforing the
 	// respective transaction.
