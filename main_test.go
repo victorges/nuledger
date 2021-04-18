@@ -35,7 +35,10 @@ func TestInputOutputCases(t *testing.T) {
 				testMain(input, outputBuf)
 
 				output, expected := readLines(outputBuf), readLines(expectedBuf)
-				So(output, ShouldResemble, expected)
+				So(len(output), ShouldEqual, len(expected))
+				for i := range expected {
+					So(output[i], ShouldEqual, expected[i])
+				}
 			})
 		}
 	})

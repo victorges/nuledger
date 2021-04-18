@@ -12,7 +12,12 @@ import (
 
 var (
 	uniqueStartTime = time.Date(2021, time.April, 1, 16, 05, 19, 0, time.UTC)
-	baseTransacton  = model.Transaction{Merchant: "One Merchant", Amount: 1, Time: uniqueStartTime}
+	baseTransacton  = model.Transaction{
+		AccountID: "the-account",
+		Merchant:  "One Merchant",
+		Amount:    1,
+		Time:      uniqueStartTime,
+	}
 )
 
 func TestUniqueTransactions(t *testing.T) {
@@ -65,6 +70,11 @@ func TestUniqueTransactions(t *testing.T) {
 					otherAmount := baseTransacton
 					otherAmount.Amount = 2 * baseTransacton.Amount
 					testSuccess(otherAmount)
+				})
+				Convey("Transactions in another account", func() {
+					otherAcc := baseTransacton
+					otherAcc.AccountID = "another-account"
+					testSuccess(otherAcc)
 				})
 				Convey("Transactions immediately after the interval", func() {
 					periodicTransaction := baseTransacton

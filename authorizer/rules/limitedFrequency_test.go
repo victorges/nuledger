@@ -51,14 +51,33 @@ func TestLimitedFrequency(t *testing.T) {
 					Convey("Or a little bit after the interval", func() {
 						testSuccess(genTransaction(interval + 1))
 					})
+					Convey("Or from another account", func() {
+						tx := genTransaction(0)
+						tx.AccountID = "another"
+						testSuccess(tx)
+					})
 				})
 				Convey("Any amount of transactions with a minimal period", func() {
 					period := interval / time.Duration(maxTxs)
 					totalDiff := period
-					for i := 0; i < 10*maxTxs; i++ {
-						testSuccess(genTransaction(totalDiff))
-						totalDiff += period
-					}
+
+					Convey("In the same account", func() {
+						for i := 0; i < 10*maxTxs; i++ {
+							testSuccess(genTransaction(totalDiff))
+							totalDiff += period
+						}
+					})
+					Convey("Or in multiple different accounts", func() {
+						accounts := []string{"a", "b", "c", "d"}
+						for i := 0; i < 10*maxTxs; i++ {
+							for _, acc := range accounts {
+								tx := genTransaction(totalDiff)
+								tx.AccountID = acc
+								testSuccess(tx)
+							}
+							totalDiff += period
+						}
+					})
 				})
 			})
 
