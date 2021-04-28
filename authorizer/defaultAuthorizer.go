@@ -20,6 +20,7 @@ func DefaultAuthorizer() rule.Authorizer {
 		&rules.ChronologicalOrder{},
 		rule.AuthorizerFunc(rules.AccountCardActive),
 		rule.AuthorizerFunc(rules.SufficientLimit),
+		rule.AuthorizerFunc(rules.MerchantDenyList),
 		rules.NewLimitedFrequency(maxIntervalTransactions, frequencyAnalysisInterval),
 		rules.NewUniqueTransactions(frequencyAnalysisInterval),
 	}

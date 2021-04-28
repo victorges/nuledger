@@ -7,4 +7,5 @@ var (
 	ErrorInsufficientLimit          = NewError(InsufficientLimit, "Transaction amount is higher than available limit")
 	ErrorHighFrequencySmallInterval = NewError(HighFrequencySmallInterval, "Too many transactions in a small interval")
 	ErrorDoubleTransaction          = NewError(DoubleTransaction, "Duplicate transaction of same amount and merchant")
+	ErrorMerchantDenied             = NewError(MerchantDenied, "Merchant is denied any transaction")
 )

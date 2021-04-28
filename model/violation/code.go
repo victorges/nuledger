@@ -13,4 +13,5 @@ const (
 	CardNotActive                   = "card-not-active"
 	HighFrequencySmallInterval      = "high-frequency-small-interval"
 	DoubleTransaction               = "double-transaction"
+	MerchantDenied                  = "merchant-denied"
 )

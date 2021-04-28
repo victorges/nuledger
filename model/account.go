@@ -10,7 +10,7 @@ type Account struct {
 	ActiveCard bool `json:"active-card"`
 	// AvailableLimit is the units of currency that the account still has.
 	// Transactions consume from this limit and it can never be exceeded.
-	AvailableLimit int64    `json"available-limit"`
+	AvailableLimit int64    `json:"available-limit"`
 	DenyList       []string `json:"deny-list"`
 }
 
