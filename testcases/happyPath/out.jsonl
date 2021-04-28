@@ -1,2 +1,2 @@
-{"account":{"active-card":true,"available-limit":100},"violations":[]}
-{"account":{"active-card":true,"available-limit":80},"violations":[]}
+{"account":{"active-card":true,"available-limit":100,"deny-list":[]},"violations":[]}
+{"account":{"active-card":true,"available-limit":80,"deny-list":[]},"violations":[]}

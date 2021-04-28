@@ -1,5 +1,5 @@
-{"account":{"active-card":true,"available-limit":1000},"violations":[]}
-{"account":{"active-card":true,"available-limit":910},"violations":[]}
-{"account":{"active-card":true,"available-limit":820},"violations":[]}
-{"account":{"active-card":true,"available-limit":730},"violations":[]}
-{"account":{"active-card":true,"available-limit":730},"violations":["high-frequency-small-interval"]}
+{"account":{"active-card":true,"available-limit":1000,"deny-list":[]},"violations":[]}
+{"account":{"active-card":true,"available-limit":910,"deny-list":[]},"violations":[]}
+{"account":{"active-card":true,"available-limit":820,"deny-list":[]},"violations":[]}
+{"account":{"active-card":true,"available-limit":730,"deny-list":[]},"violations":[]}
+{"account":{"active-card":true,"available-limit":730,"deny-list":[]},"violations":["high-frequency-small-interval"]}

@@ -113,7 +113,9 @@ func TestHandlerBadInput(t *testing.T) {
 				test(iop.OperationInput{})
 			})
 			Convey("For ambiguous operations", func() {
-				test(iop.OperationInput{&model.Account{}, &model.Transaction{}})
+				test(iop.OperationInput{&model.Account{}, &model.Transaction{}, []string{}})
+				test(iop.OperationInput{&model.Account{}, nil, []string{}})
+				test(iop.OperationInput{nil, &model.Transaction{}, []string{}})
 			})
 		})
 
@@ -163,7 +165,7 @@ func TestDefaultAuthorizers(t *testing.T) {
 			list := authzer.(rule.List)
 
 			Convey("With all required authorization rules", func() {
-				So(list, ShouldHaveLength, 5)
+				So(list, ShouldHaveLength, 6)
 				So(list, ShouldContain, &rules.ChronologicalOrder{})
 				So(list, ShouldContain, rules.NewLimitedFrequency(3, 2*time.Minute))
 				So(list, ShouldContain, rules.NewUniqueTransactions(2*time.Minute))
@@ -179,7 +181,7 @@ func TestDefaultAuthorizers(t *testing.T) {
 		So(err, ShouldBeNil)
 
 		Convey("It should use the default authorizers", func() {
-			expected := iop.StateOutput{Account: &model.Account{}, Violations: []violation.Code{violation.CardNotActive}}
+			expected := iop.StateOutput{Account: &model.Account{DenyList: []string{}}, Violations: []violation.Code{violation.CardNotActive}}
 			output, err := handler.Handle(iop.OperationInput{Transaction: &model.Transaction{}})
 			So(err, ShouldBeNil)
 			So(output, ShouldResemble, expected)

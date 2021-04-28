@@ -39,7 +39,7 @@ func TestLedger(t *testing.T) {
 			})
 
 			Convey("It should allow creating an account", func() {
-				accountReq := model.Account{ActiveCard: true, AvailableLimit: 2}
+				accountReq := model.Account{ActiveCard: true, AvailableLimit: 2, DenyList: []string{}}
 
 				account, err := ledger.CreateAccount(accountReq)
 				So(err, ShouldBeNil)
@@ -49,7 +49,7 @@ func TestLedger(t *testing.T) {
 		})
 
 		Convey("When there is an account created", func() {
-			initAccountState := model.Account{ActiveCard: true, AvailableLimit: 500}
+			initAccountState := model.Account{ActiveCard: true, AvailableLimit: 500, DenyList: []string{}}
 			_, err := ledger.CreateAccount(initAccountState)
 			So(err, ShouldBeNil)
 

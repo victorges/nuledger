@@ -1,3 +1,3 @@
-{"account":{"active-card":true,"available-limit":1000},"violations":[]}
-{"account":{"active-card":true,"available-limit":910},"violations":[]}
-{"account":{"active-card":true,"available-limit":910},"violations":["double-transaction"]}
+{"account":{"active-card":true,"available-limit":1000,"deny-list":[]},"violations":[]}
+{"account":{"active-card":true,"available-limit":910,"deny-list":[]},"violations":[]}
+{"account":{"active-card":true,"available-limit":910,"deny-list":[]},"violations":["double-transaction"]}
