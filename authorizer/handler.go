@@ -39,6 +39,8 @@ func (h *Handler) Handle(op iop.OperationInput) (iop.StateOutput, error) {
 		account, err = h.CreateAccount(*op.Account)
 	case operationTypePerformTransaction:
 		account, err = h.PerformTransaction(*op.Transaction)
+	case operationTypeDenyList:
+		account, err = h.SetDenyList(op.DenyList)
 	}
 
 	violations, err := extractViolations(err)
@@ -56,6 +58,7 @@ const (
 	operationTypeUnknown operationType = iota
 	operationTypeCreateAccount
 	operationTypePerformTransaction
+	operationTypeDenyList
 )
 
 // getOperationType receives the input JSON object and returns what is the
@@ -65,13 +68,27 @@ const (
 func getOperationType(op iop.OperationInput) (operationType, error) {
 	hasAccount := op.Account != nil
 	hasTransaction := op.Transaction != nil
-	if hasAccount == hasTransaction {
+	hasDenyList := op.DenyList != nil
+	if countTrues(hasAccount, hasTransaction, hasDenyList) != 1 {
 		return operationTypeUnknown, errors.New(`Must have exactly 1 of "account" or "transaction" fields set`)
 	}
 	if hasAccount {
 		return operationTypeCreateAccount, nil
+	} else if hasDenyList {
+		return operationTypeDenyList, nil
+	} else {
+		return operationTypePerformTransaction, nil
 	}
-	return operationTypePerformTransaction, nil
+}
+
+func countTrues(booleans ...bool) int {
+	count := 0
+	for _, b := range booleans {
+		if b {
+			count++
+		}
+	}
+	return count
 }
 
 // extractViolations receives an error and tries to fetch the specific violation

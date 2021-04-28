@@ -15,6 +15,8 @@ type OperationInput struct {
 	// Transaction represents a transaction request. If it is not null, it
 	// should contain the details about the transaction being attempted.
 	Transaction *model.Transaction `json:"transaction"`
+
+	DenyList []string `json:"deny-list"`
 }
 
 // StateOutput represents a JSON to be written in the output as the result of

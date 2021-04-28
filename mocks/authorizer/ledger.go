@@ -63,3 +63,18 @@ func (mr *MockLedgerMockRecorder) PerformTransaction(transaction interface{}) *g
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PerformTransaction", reflect.TypeOf((*MockLedger)(nil).PerformTransaction), transaction)
 }
+
+// SetDenyList mocks base method.
+func (m *MockLedger) SetDenyList(merchants []string) (*model.Account, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetDenyList", merchants)
+	ret0, _ := ret[0].(*model.Account)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SetDenyList indicates an expected call of SetDenyList.
+func (mr *MockLedgerMockRecorder) SetDenyList(merchants interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetDenyList", reflect.TypeOf((*MockLedger)(nil).SetDenyList), merchants)
+}
