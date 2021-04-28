@@ -29,6 +29,8 @@ type Ledger interface {
 	// representing a non-exsiting account. If the transaction is performed
 	// successfully, the returned account will have the updated state (balance).
 	PerformTransaction(transaction model.Transaction) (*model.Account, error)
+
+	SetDenyList(merchants []string) (*model.Account, error)
 }
 
 // NewLedger creates an AuthLedger object with the provided Authorizer, which is
@@ -60,6 +62,9 @@ func (l *AuthLedger) CreateAccount(account model.Account) (*model.Account, error
 	}
 
 	l.accountState = &account
+	if l.accountState.DenyList == nil {
+		l.accountState.DenyList = []string{}
+	}
 	return l.accountState.Copy(), nil
 }
 
@@ -82,4 +87,13 @@ func (l *AuthLedger) PerformTransaction(transaction model.Transaction) (*model.A
 		commitFunc()
 	}
 	return account.Copy(), nil
+}
+
+func (l *AuthLedger) SetDenyList(merchants []string) (*model.Account, error) {
+	if l.accountState == nil {
+		return nil, violation.ErrorAccountNotInitialized
+	}
+
+	l.accountState.DenyList = append([]string{}, merchants...)
+	return l.accountState.Copy(), nil
 }
