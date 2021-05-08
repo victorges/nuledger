@@ -2,6 +2,7 @@ package rules_test
 
 import (
 	"errors"
+	"nuledger/authorizer/rule"
 	"nuledger/authorizer/rules"
 	"nuledger/model"
 	"nuledger/model/violation"
@@ -68,6 +69,45 @@ func TestChronologicalOrder(t *testing.T) {
 				_, err := authzer.Authorize(model.Account{}, model.Transaction{Time: startTime.Add(-1 * time.Microsecond)})
 				So(err, ShouldNotBeNil)
 				So(errors.As(err, &violation.Error{}), ShouldBeFalse)
+			})
+		})
+	})
+}
+func TestMerchantDenyList(t *testing.T) {
+	Convey("Given MerchantDenyList authorizer function", t, func() {
+		authzer := rule.AuthorizerFunc(rules.MerchantDenyList)
+
+		Convey("It should authorize when there are no denied merchants", func() {
+			commitFunc, err := authzer.Authorize(model.Account{ActiveCard: true}, model.Transaction{})
+			So(commitFunc, ShouldBeNil)
+			So(err, ShouldBeNil)
+		})
+
+		Convey("It should authorize when there are other denied merchants", func() {
+			account := model.Account{ActiveCard: true, DenyList: []string{"another merch"}}
+			transaction := model.Transaction{Merchant: "merch"}
+
+			commitFunc, err := authzer.Authorize(account, transaction)
+			So(commitFunc, ShouldBeNil)
+			So(err, ShouldBeNil)
+		})
+
+		Convey("It should NOT authorize when merchant is in deny list", func() {
+			account := model.Account{ActiveCard: true}
+			transaction := model.Transaction{Merchant: "test"}
+
+			Convey("When there's a single denied merchant", func() {
+				account.DenyList = []string{"test"}
+				commitFunc, err := authzer.Authorize(account, transaction)
+				So(commitFunc, ShouldBeNil)
+				So(err, ShouldResemble, violation.ErrorMerchantDenied)
+			})
+
+			Convey("When there are multiple denied merchant", func() {
+				account.DenyList = []string{"test1", "test2", "test", "test3"}
+				commitFunc, err := authzer.Authorize(account, transaction)
+				So(commitFunc, ShouldBeNil)
+				So(err, ShouldResemble, violation.ErrorMerchantDenied)
 			})
 		})
 	})

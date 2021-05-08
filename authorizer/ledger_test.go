@@ -38,6 +38,12 @@ func TestLedger(t *testing.T) {
 				So(verr.Code, ShouldEqual, violation.AccountNotInitialized)
 			})
 
+			Convey("It should not allow setting deny list", func() {
+				account, err := ledger.SetDenyList([]string{"dummy"})
+				So(err, ShouldResemble, violation.ErrorAccountNotInitialized)
+				So(account, ShouldBeNil)
+			})
+
 			Convey("It should allow creating an account", func() {
 				accountReq := model.Account{ActiveCard: true, AvailableLimit: 2, DenyList: []string{}}
 
@@ -63,6 +69,26 @@ func TestLedger(t *testing.T) {
 				var verr violation.Error
 				So(errors.As(err, &verr), ShouldBeTrue)
 				So(verr.Code, ShouldEqual, violation.AccountAlreadyInitialized)
+			})
+
+			Convey("It changes deny list on set", func() {
+				denyList := []string{"dummy1", "dummy2"}
+				expectedAccount := initAccountState
+				expectedAccount.DenyList = denyList
+
+				account, err := ledger.SetDenyList(denyList)
+				So(err, ShouldBeNil)
+				So(account, ShouldResemble, &expectedAccount)
+
+				Convey("It allows removing deny list elements", func() {
+					denyList := []string{"dummy2"}
+					expectedAccount := initAccountState
+					expectedAccount.DenyList = denyList
+
+					account, err := ledger.SetDenyList(denyList)
+					So(err, ShouldBeNil)
+					So(account, ShouldResemble, &expectedAccount)
+				})
 			})
 
 			Convey("It should check transactions with authorizer", func() {
